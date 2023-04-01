@@ -258,7 +258,6 @@ defmodule GitpodWeb.CoreComponents do
   attr :name, :any
   attr :label, :string, default: nil
   attr :value, :any
-  attr :help_text, :string, default: nil
 
   attr :type, :string,
     default: "text",
@@ -269,11 +268,29 @@ defmodule GitpodWeb.CoreComponents do
     doc: "a form field struct retrieved from the form, for example: @form[:email]"
 
   attr :errors, :list, default: []
-  attr :checked, :boolean, doc: "the checked flag for checkbox inputs"
-  attr :indeterminate, :boolean, doc: "the indeterminate flag for checkbox inputs"
-  attr :prompt, :string, default: nil, doc: "the prompt for select inputs"
-  attr :options, :list, doc: "the options to pass to Phoenix.HTML.Form.options_for_select/2"
+  attr :helpText, :string, default: nil, doc: "the help text shown below the input"
+  attr :placeholder, :string, default: nil, doc: "the placeholder text shown inside the input"
+  attr :disabled, :boolean, default: false, doc: "set the input to disabled"
+  attr :clearable, :boolean, default: false, doc: "add a clickable icon to clear the value"
+
+  attr :passwordToggle, :boolean,
+    default: false,
+    doc: "add a clickable icon to toggle password visibility"
+
+  # sl_checkbox component
+  # attr :checked, :boolean, default: false, doc: "the checked flag for checkbox inputs"
+  attr :indeterminate, :boolean, default: false, doc: "the indeterminate flag for checkbox inputs"
+
+  # sl_select component
+  # attr :prompt, :string, default: nil, doc: "the prompt for select inputs"
+  attr :options, :list, doc: "the options to pass to options_for_sl_select/2"
   attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
+
+  attr :maxOptionsVisible, :integer,
+    default: 3,
+    doc:
+      "the maximum number of selected options to show when multiple is true. After the maximum, '+n' will be shown to indicate the number of additional items that are selected. Set to 0 to remove the limit."
+
   attr :rest, :global, include: ~w(autocomplete cols disabled form max maxlength min minlength
                                    pattern placeholder readonly required rows size step)
   slot :inner_block
@@ -293,7 +310,14 @@ defmodule GitpodWeb.CoreComponents do
 
     ~H"""
     <div phx-feedback-for={@name}>
-      <sl-checkbox value="true" name={@name} checked={@checked} indeterminate={@indeterminate} {@rest}>
+      <sl-checkbox
+        value={@value}
+        name={@name}
+        checked={@checked}
+        indeterminate={@indeterminate}
+        disabled={@disabled}
+        {@rest}
+      >
         <%= @label %>
       </sl-checkbox>
       <.error :for={msg <- @errors}><%= msg %></.error>
@@ -304,25 +328,18 @@ defmodule GitpodWeb.CoreComponents do
   def sl_input(%{type: "select"} = assigns) do
     ~H"""
     <div phx-feedback-for={@name}>
-      <.label for={@id}><%= @label %></.label>
-      <select
-        id={@id}
-        name={@name}
-        class="block w-full px-3 py-2 mt-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-zinc-500 focus:border-zinc-500 sm:text-sm"
+      <sl-select
+        value={@value}
+        label={@label}
+        help-text={@helpText}
+        placeholder={@placeholder}
+        clearable={@clearable}
+        disabled={@disabled}
         multiple={@multiple}
+        max-options-visible={@maxOptionsVisible}
         {@rest}
       >
-        <option :if={@prompt} value=""><%= @prompt %></option>
-        <%= Phoenix.HTML.Form.options_for_select(@options, @value) %>
-      </select>
-      <sl-select label={@label} help-text={@help_text}>
-        <sl-option :if={@prompt} value=""><%= @prompt %></sl-option>
-        <sl-option value="option-1">Option 1</sl-option>
-        <sl-option value="option-2">Option 2</sl-option>
-        <sl-option value="option-3">Option 3</sl-option>
-        <sl-option value="option-4">Option 4</sl-option>
-        <sl-option value="option-5">Option 5</sl-option>
-        <sl-option value="option-6">Option 6</sl-option>
+        <%= options_for_sl_select(@options, @value) %>
       </sl-select>
       <.error :for={msg <- @errors}><%= msg %></.error>
     </div>
@@ -852,8 +869,8 @@ defmodule GitpodWeb.CoreComponents do
   defp sl_option(group_label, group_values, [], value)
        when is_list(group_values) or is_map(group_values) do
     section_options = escaped_options_for_sl_select(group_values, value)
-    "<small>#{group_label}</small>#{section_options}"
-    # sl_option_tag("optgroup", [label: group_label], {:safe, section_options})
+
+    "<sl-divider class='first-of-type:hidden'></sl-divider><small>#{group_label}</small>#{section_options}"
   end
 
   defp sl_option(option_key, option_value, extra, value) do

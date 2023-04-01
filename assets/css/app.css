@@ -98,6 +98,12 @@ sl-badge[variant="neutral"]::part(base) {
 	color: var(--sl-color-neutral-800);
 }
 
+/* Divider */
+sl-divider {
+	/* Overdide reset rules from Tailwind Css */
+	border-top: solid var(--width) var(--color);
+}
+
 /* dialog */
 /* sl-dialog::part(overlay) {
 	background-color: var(--sl-color-neutral-500);
