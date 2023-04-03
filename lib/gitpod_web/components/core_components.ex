@@ -114,7 +114,7 @@ defmodule GitpodWeb.CoreComponents do
                   <.link
                     :for={cancel <- @cancel}
                     phx-click={hide_modal(@on_cancel, @id)}
-                    class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-700"
+                    class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-700 focus:ring-primary-500 focus:ring-offset-2"
                   >
                     <%= render_slot(cancel) %>
                   </.link>
@@ -139,7 +139,11 @@ defmodule GitpodWeb.CoreComponents do
   attr :id, :string, default: "flash", doc: "the optional id of flash container"
   attr :flash, :map, default: %{}, doc: "the map of flash messages to display"
   attr :title, :string, default: nil
-  attr :kind, :atom, values: [:info, :error], doc: "used for styling and flash lookup"
+
+  attr :kind, :atom,
+    values: [:info, :success, :warning, :error],
+    doc: "used for styling and flash lookup"
+
   attr :autoshow, :boolean, default: true, doc: "whether to auto show the flash on mount"
   attr :close, :boolean, default: true, doc: "whether the flash can be closed"
   attr :rest, :global, doc: "the arbitrary HTML attributes to add to the flash container"
@@ -156,13 +160,26 @@ defmodule GitpodWeb.CoreComponents do
       role="alert"
       class={[
         "fixed hidden top-2 right-2 w-80 sm:w-96 z-50 rounded-lg p-3 shadow-md shadow-zinc-900/5 ring-1",
-        @kind == :info && "bg-emerald-50 text-emerald-800 ring-emerald-500 fill-cyan-900",
-        @kind == :error && "bg-rose-50 p-3 text-rose-900 shadow-md ring-rose-500 fill-rose-900"
+        @kind == :info && "border-l-4 border-blue-400 bg-blue-50 text-blue-700",
+        @kind == :success && "border-l-4 border-green-400 bg-green-50 text-green-700",
+        @kind == :warning && "border-l-4 border-yellow-400 bg-yellow-50 text-yellow-700",
+        @kind == :error && "border-l-4 border-red-400 bg-red-50 text-red-700"
       ]}
       {@rest}
     >
-      <p :if={@title} class="flex items-center gap-1.5 text-[0.8125rem] font-semibold leading-6">
+      <p
+        :if={@title}
+        class={[
+          "flex items-center gap-1.5 text-[0.8125rem] font-semibold leading-6",
+          @kind == :info && "text-blue-800",
+          @kind == :success && "text-green-800",
+          @kind == :warning && "text-yellow-800",
+          @kind == :error && "text-red-800"
+        ]}
+      >
         <Heroicons.information_circle :if={@kind == :info} mini class="w-4 h-4" />
+        <Heroicons.check_circle :if={@kind == :success} mini class="w-4 h-4" />
+        <Heroicons.exclamation_triangle :if={@kind == :warning} mini class="w-4 h-4" />
         <Heroicons.exclamation_circle :if={@kind == :error} mini class="w-4 h-4" />
         <%= @title %>
       </p>
@@ -190,7 +207,9 @@ defmodule GitpodWeb.CoreComponents do
 
   def flash_group(assigns) do
     ~H"""
-    <.flash kind={:info} title="Success!" flash={@flash} />
+    <.flash kind={:info} title="Information!" flash={@flash} />
+    <.flash kind={:success} title="Success!" flash={@flash} />
+    <.flash kind={:warning} title="Warning!" flash={@flash} />
     <.flash kind={:error} title="Error!" flash={@flash} />
     <.flash
       id="disconnected"
@@ -243,154 +262,6 @@ defmodule GitpodWeb.CoreComponents do
   end
 
   @doc """
-  Renders an input with label and error messages.
-
-  A `%Phoenix.HTML.Form{}` and field name may be passed to the input
-  to build input names and error messages, or all the attributes and
-  errors may be passed explicitly.
-
-  ## Examples
-
-      <.input field={@form[:email]} type="email" />
-      <.input name="my-input" errors={["oh no!"]} />
-  """
-  attr :id, :any, default: nil
-  attr :name, :any
-  attr :label, :string, default: nil
-  attr :value, :any
-
-  attr :type, :string,
-    default: "text",
-    values: ~w(checkbox color date datetime-local email file hidden month number password
-               range radio search select tel text textarea time url week)
-
-  attr :field, Phoenix.HTML.FormField,
-    doc: "a form field struct retrieved from the form, for example: @form[:email]"
-
-  attr :errors, :list, default: []
-  attr :helpText, :string, default: nil, doc: "the help text shown below the input"
-  attr :placeholder, :string, default: nil, doc: "the placeholder text shown inside the input"
-  attr :disabled, :boolean, default: false, doc: "set the input to disabled"
-  attr :clearable, :boolean, default: false, doc: "add a clickable icon to clear the value"
-
-  attr :passwordToggle, :boolean,
-    default: false,
-    doc: "add a clickable icon to toggle password visibility"
-
-  # sl_checkbox component
-  # attr :checked, :boolean, default: false, doc: "the checked flag for checkbox inputs"
-  attr :indeterminate, :boolean, default: false, doc: "the indeterminate flag for checkbox inputs"
-
-  # sl_select component
-  # attr :prompt, :string, default: nil, doc: "the prompt for select inputs"
-  attr :options, :list, doc: "the options to pass to options_for_sl_select/2"
-  attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
-
-  attr :maxOptionsVisible, :integer,
-    default: 3,
-    doc:
-      "the maximum number of selected options to show when multiple is true. After the maximum, '+n' will be shown to indicate the number of additional items that are selected. Set to 0 to remove the limit."
-
-  attr :rest, :global, include: ~w(autocomplete cols disabled form max maxlength min minlength
-                                   pattern placeholder readonly required rows size step)
-  slot :inner_block
-
-  def sl_input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
-    assigns
-    |> assign(field: nil, id: assigns.id || field.id)
-    |> assign(:errors, Enum.map(field.errors, &translate_error(&1)))
-    |> assign_new(:name, fn -> if assigns.multiple, do: field.name <> "[]", else: field.name end)
-    |> assign_new(:value, fn -> field.value end)
-    |> input()
-  end
-
-  def sl_input(%{type: "checkbox", value: value} = assigns) do
-    assigns =
-      assign_new(assigns, :checked, fn -> Phoenix.HTML.Form.normalize_value("checkbox", value) end)
-
-    ~H"""
-    <div phx-feedback-for={@name}>
-      <sl-checkbox
-        value={@value}
-        name={@name}
-        checked={@checked}
-        indeterminate={@indeterminate}
-        disabled={@disabled}
-        {@rest}
-      >
-        <%= @label %>
-      </sl-checkbox>
-      <.error :for={msg <- @errors}><%= msg %></.error>
-    </div>
-    """
-  end
-
-  def sl_input(%{type: "select"} = assigns) do
-    ~H"""
-    <div phx-feedback-for={@name}>
-      <sl-select
-        value={@value}
-        label={@label}
-        help-text={@helpText}
-        placeholder={@placeholder}
-        clearable={@clearable}
-        disabled={@disabled}
-        multiple={@multiple}
-        max-options-visible={@maxOptionsVisible}
-        {@rest}
-      >
-        <%= options_for_sl_select(@options, @value) %>
-      </sl-select>
-      <.error :for={msg <- @errors}><%= msg %></.error>
-    </div>
-    """
-  end
-
-  # def input(%{type: "textarea"} = assigns) do
-  #   ~H"""
-  #   <div phx-feedback-for={@name}>
-  #     <.label for={@id}><%= @label %></.label>
-  #     <textarea
-  #       id={@id || @name}
-  #       name={@name}
-  #       class={[
-  #         "mt-2 block min-h-[6rem] w-full rounded-lg border-zinc-300 py-[7px] px-[11px]",
-  #         "text-zinc-900 focus:border-zinc-400 focus:outline-none focus:ring-4 focus:ring-zinc-800/5 sm:text-sm sm:leading-6",
-  #         "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 phx-no-feedback:focus:ring-zinc-800/5",
-  #         "border-zinc-300 focus:border-zinc-400 focus:ring-zinc-800/5",
-  #         @errors != [] && "border-rose-400 focus:border-rose-400 focus:ring-rose-400/10"
-  #       ]}
-  #       {@rest}
-  #     ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
-  #     <.error :for={msg <- @errors}><%= msg %></.error>
-  #   </div>
-  #   """
-  # end
-
-  # def input(assigns) do
-  #   ~H"""
-  #   <div phx-feedback-for={@name}>
-  #     <.label for={@id}><%= @label %></.label>
-  #     <input
-  #       type={@type}
-  #       name={@name}
-  #       id={@id || @name}
-  #       value={Phoenix.HTML.Form.normalize_value(@type, @value)}
-  #       class={[
-  #         "mt-2 block w-full rounded-lg border-zinc-300 py-[7px] px-[11px]",
-  #         "text-zinc-900 focus:outline-none focus:ring-4 sm:text-sm sm:leading-6",
-  #         "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 phx-no-feedback:focus:ring-zinc-800/5",
-  #         "border-zinc-300 focus:border-zinc-400 focus:ring-zinc-800/5",
-  #         @errors != [] && "border-rose-400 focus:border-rose-400 focus:ring-rose-400/10"
-  #       ]}
-  #       {@rest}
-  #     />
-  #     <.error :for={msg <- @errors}><%= msg %></.error>
-  #   </div>
-  #   """
-  # end
-
-  @doc """
   Renders a button.
 
   ## Examples
@@ -400,6 +271,11 @@ defmodule GitpodWeb.CoreComponents do
   """
   attr :type, :string, default: nil
   attr :class, :string, default: nil
+
+  attr :kind, :atom,
+    values: [:primary, :secondary],
+    doc: "used for styling"
+
   attr :rest, :global, include: ~w(disabled form name value)
 
   slot :inner_block, required: true
@@ -409,8 +285,13 @@ defmodule GitpodWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded-lg bg-zinc-900 hover:bg-zinc-700 py-2 px-3",
-        "text-sm font-semibold leading-6 text-white active:text-white/80",
+        "phx-submit-loading:opacity-75 rounded-md py-2 px-3 shadow-sm",
+        "text-sm font-semibold",
+        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+        @kind == :primary &&
+          "text-white bg-primary-600 active:text-white/80 hover:bg-primary-500 focus-visible:outline-primary-600 dark:bg-primary-500 dark:active:text-white/80 dark:hover:bg-primary-400 dark:focus-visible:outline-primary-500",
+        @kind == :secondary &&
+          "text-gray-900 bg-white ring-1 ring-inset ring-gray-300 active:text-gray-900/80 hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:active:text-white/80 dark:hover:bg-white/20",
         @class
       ]}
       {@rest}
@@ -453,6 +334,7 @@ defmodule GitpodWeb.CoreComponents do
   attr :rest, :global, include: ~w(autocomplete cols disabled form max maxlength min minlength
                                    pattern placeholder readonly required rows size step)
   slot :inner_block
+  slot :help_text
 
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
     assigns
@@ -477,12 +359,21 @@ defmodule GitpodWeb.CoreComponents do
           name={@name}
           value="true"
           checked={@checked}
-          class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900"
+          class="w-4 h-4 border-gray-300 rounded text-primary-600 focus:ring-primary-600"
+          aria-describedby={
+            if @errors != [], do: "#{@id}-error #{@id}-description", else: "#{@id}-description"
+          }
+          {@errors != [] && "aria-invalid='true'"}
           {@rest}
         />
         <%= @label %>
       </label>
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <p :if={@help_text} class="mt-2 text-sm text-gray-500" id={"#{@id}-description"}>
+        <%= render_slot(@help_text) %>
+      </p>
+      <div :if={@errors != []} class="mt-2" id={"#{@id}-error"}>
+        <.error :for={msg <- @errors}><%= msg %></.error>
+      </div>
     </div>
     """
   end
@@ -510,19 +401,38 @@ defmodule GitpodWeb.CoreComponents do
     ~H"""
     <div phx-feedback-for={@name}>
       <.label for={@id}><%= @label %></.label>
-      <textarea
-        id={@id || @name}
-        name={@name}
-        class={[
-          "mt-2 block min-h-[6rem] w-full rounded-lg border-zinc-300 py-[7px] px-[11px]",
-          "text-zinc-900 focus:border-zinc-400 focus:outline-none focus:ring-4 focus:ring-zinc-800/5 sm:text-sm sm:leading-6",
-          "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 phx-no-feedback:focus:ring-zinc-800/5",
-          "border-zinc-300 focus:border-zinc-400 focus:ring-zinc-800/5",
-          @errors != [] && "border-rose-400 focus:border-rose-400 focus:ring-rose-400/10"
-        ]}
-        {@rest}
-      ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <div class="relative mt-2">
+        <textarea
+          id={@id || @name}
+          name={@name}
+          class={[
+            "block w-full rounded-md shadow-sm sm:py-1.5",
+            "text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6",
+            "phx-no-feedback:ring-gray-300 phx-no-feedback:focus:ring-2 phx-no-feedback:focus:ring-inset phx-no-feedback:focus:ring-primary-600",
+            "border-0 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600",
+            @errors != [] && "text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500"
+          ]}
+          aria-describedby={
+            if @errors != [], do: "#{@id}-error #{@id}-description", else: "#{@id}-description"
+          }
+          {@errors != [] && "aria-invalid='true'"}
+          {@rest}
+        >
+          <%= Phoenix.HTML.Form.normalize_value("textarea", @value) %>
+        </textarea>
+        <div
+          :if={@errors != []}
+          class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
+        >
+          <Heroicons.exclamation_circle mini class="w-5 h-5" />
+        </div>
+      </div>
+      <p :if={@help_text} class="mt-2 text-sm text-gray-500" id={"#{@id}-description"}>
+        <%= render_slot(@help_text) %>
+      </p>
+      <div :if={@errors != []} class="mt-2" id={"#{@id}-error"}>
+        <.error :for={msg <- @errors}><%= msg %></.error>
+      </div>
     </div>
     """
   end
@@ -531,21 +441,38 @@ defmodule GitpodWeb.CoreComponents do
     ~H"""
     <div phx-feedback-for={@name}>
       <.label for={@id}><%= @label %></.label>
-      <input
-        type={@type}
-        name={@name}
-        id={@id || @name}
-        value={Phoenix.HTML.Form.normalize_value(@type, @value)}
-        class={[
-          "mt-2 block w-full rounded-lg border-zinc-300 py-[7px] px-[11px]",
-          "text-zinc-900 focus:outline-none focus:ring-4 sm:text-sm sm:leading-6",
-          "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 phx-no-feedback:focus:ring-zinc-800/5",
-          "border-zinc-300 focus:border-zinc-400 focus:ring-zinc-800/5",
-          @errors != [] && "border-rose-400 focus:border-rose-400 focus:ring-rose-400/10"
-        ]}
-        {@rest}
-      />
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <div class="relative mt-2">
+        <input
+          type={@type}
+          name={@name}
+          id={@id || @name}
+          value={Phoenix.HTML.Form.normalize_value(@type, @value)}
+          class={[
+            "block w-full rounded-md shadow-sm py-1.5",
+            "text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6",
+            "phx-no-feedback:ring-gray-300 phx-no-feedback:focus:ring-2 phx-no-feedback:focus:ring-inset phx-no-feedback:focus:ring-primary-600",
+            "border-0 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600",
+            @errors != [] && "text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500"
+          ]}
+          aria-describedby={
+            if @errors != [], do: "#{@id}-error #{@id}-description", else: "#{@id}-description"
+          }
+          {@errors != [] && "aria-invalid='true'"}
+          {@rest}
+        />
+        <div
+          :if={@errors != []}
+          class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
+        >
+          <Heroicons.exclamation_circle mini class="w-5 h-5" />
+        </div>
+      </div>
+      <p :if={@help_text} class="mt-2 text-sm text-gray-500" id={"#{@id}-description"}>
+        <%= render_slot(@help_text) %>
+      </p>
+      <div :if={@errors != []} class="mt-2" id={"#{@id}-error"}>
+        <.error :for={msg <- @errors}><%= msg %></.error>
+      </div>
     </div>
     """
   end
@@ -558,7 +485,7 @@ defmodule GitpodWeb.CoreComponents do
 
   def label(assigns) do
     ~H"""
-    <label for={@for} class="block text-sm font-semibold leading-6 text-zinc-800">
+    <label for={@for} class="block text-sm font-medium leading-6 text-gray-900">
       <%= render_slot(@inner_block) %>
     </label>
     """
@@ -571,8 +498,7 @@ defmodule GitpodWeb.CoreComponents do
 
   def error(assigns) do
     ~H"""
-    <p class="flex gap-3 mt-3 text-sm leading-6 phx-no-feedback:hidden text-rose-600">
-      <Heroicons.exclamation_circle mini class="mt-0.5 h-5 w-5 flex-none fill-rose-500" />
+    <p class="flex gap-3 text-sm leading-6 text-red-600 phx-no-feedback:hidden">
       <%= render_slot(@inner_block) %>
     </p>
     """

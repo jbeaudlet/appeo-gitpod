@@ -4,25 +4,6 @@ defmodule GitpodWeb.SvelteLive do
   def render(assigns) do
     ~H"""
     <LiveSvelte.render name="Example" props={%{number: @number}} />
-    <sl-input label="What is your name?" />
-    <sl-input label="Nickname" help-text="What would you like people to call you?" />
-    <.sl_input label="check me" type="checkbox" value={true} name="check" />
-    <%!-- <.sl_input
-      label="Nickname"
-      name="nickname"
-      help-text="What would you like people to call you?"
-    /> --%>
-    <.sl_input
-      type="select"
-      value=""
-      label="select"
-      options={[Europe: ["UK", "Sweden", "France"], USA: ["NY", "LA"]]}
-      name="select"
-      helpText="chosse user"
-      multiple
-      clearable
-      maxOptionsVisible={1}
-    />
     """
   end
 
