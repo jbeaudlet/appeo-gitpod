@@ -1,5 +1,6 @@
 defmodule GitpodWeb.Router do
   use GitpodWeb, :router
+  import PhoenixStorybook.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -14,11 +15,17 @@ defmodule GitpodWeb.Router do
     plug :accepts, ["json"]
   end
 
+  scope "/" do
+    storybook_assets()
+  end
+
   scope "/", GitpodWeb do
     pipe_through :browser
 
     get "/", PageController, :home
     live "/svelte", SvelteLive
+
+    live_storybook("/storybook", backend_module: GitpodWeb.Storybook)
   end
 
   # Other scopes may use custom stacks.

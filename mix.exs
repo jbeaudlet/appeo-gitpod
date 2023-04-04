@@ -50,7 +50,8 @@ defmodule Gitpod.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
-      {:live_svelte, "~> 0.3.5"}
+      {:live_svelte, "~> 0.3.5"},
+      {:phoenix_storybook, "~> 0.5.0"}
     ]
   end
 
@@ -73,6 +74,7 @@ defmodule Gitpod.MixProject do
       ],
       "assets.deploy": [
         "cmd --cd assets npm run shoelace:prepare && node build.js --deploy",
+        "tailwind default --minify",
         "phx.digest"
       ]
     ]

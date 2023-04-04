@@ -9,7 +9,7 @@ const watch = args.includes("--watch");
 const deploy = args.includes("--deploy");
 
 let optsClient = {
-	entryPoints: ["js/app.js"],
+	entryPoints: ["js/app.js", "js/storybook.js"],
 	mainFields: ["svelte", "browser", "module", "main"],
 	bundle: true,
 	minify: false,
