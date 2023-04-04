@@ -220,7 +220,8 @@ defmodule GitpodWeb.CoreComponents do
       phx-disconnected={show("#disconnected")}
       phx-connected={hide("#disconnected")}
     >
-      Attempting to reconnect <Heroicons.arrow_path class="inline w-3 h-3 ml-1 animate-spin" />
+      <%= gettext("Attempting to reconnect") %>
+      <Heroicons.arrow_path class="inline w-3 h-3 ml-1 animate-spin" />
     </.flash>
     """
   end
@@ -361,7 +362,10 @@ defmodule GitpodWeb.CoreComponents do
           checked={@checked}
           class="w-4 h-4 border-gray-300 rounded text-primary-600 focus:ring-primary-600"
           aria-describedby={
-            if @errors != [], do: "#{@id}-error #{@id}-description", else: "#{@id}-description"
+            if @errors != [],
+              do:
+                "#{Enum.map_join(Enum.to_list(0..(Enum.count(@errors) - 1)), ' ', &'#{@id}-error-#{&1}')} #{@id}-description",
+              else: "#{@id}-description"
           }
           {@errors != [] && "aria-invalid='true'"}
           {@rest}
@@ -413,7 +417,10 @@ defmodule GitpodWeb.CoreComponents do
             @errors != [] && "text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500"
           ]}
           aria-describedby={
-            if @errors != [], do: "#{@id}-error #{@id}-description", else: "#{@id}-description"
+            if @errors != [],
+              do:
+                "#{Enum.map_join(Enum.to_list(0..(Enum.count(@errors) - 1)), ' ', &'#{@id}-error-#{&1}')} #{@id}-description",
+              else: "#{@id}-description"
           }
           {@errors != [] && "aria-invalid='true'"}
           {@rest}
@@ -455,7 +462,10 @@ defmodule GitpodWeb.CoreComponents do
             @errors != [] && "text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500"
           ]}
           aria-describedby={
-            if @errors != [], do: "#{@id}-error #{@id}-description", else: "#{@id}-description"
+            if @errors != [],
+              do:
+                "#{Enum.map_join(Enum.to_list(0..(Enum.count(@errors) - 1)), ' ', &'#{@id}-error-#{&1}')} #{@id}-description",
+              else: "#{@id}-description"
           }
           {@errors != [] && "aria-invalid='true'"}
           {@rest}
@@ -470,8 +480,8 @@ defmodule GitpodWeb.CoreComponents do
       <p :if={@help_text} class="mt-2 text-sm text-gray-500" id={"#{@id}-description"}>
         <%= render_slot(@help_text) %>
       </p>
-      <div :if={@errors != []} class="mt-2" id={"#{@id}-error"}>
-        <.error :for={msg <- @errors}><%= msg %></.error>
+      <div :if={@errors != []} class="mt-2">
+        <.error :for={{msg, i} <- @errors} id={"#{@id}-error-#{i}"}><%= msg %></.error>
       </div>
     </div>
     """
@@ -494,11 +504,13 @@ defmodule GitpodWeb.CoreComponents do
   @doc """
   Generates a generic error message.
   """
+  attr :id, :string
+
   slot :inner_block, required: true
 
   def error(assigns) do
     ~H"""
-    <p class="flex gap-3 text-sm leading-6 text-red-600 phx-no-feedback:hidden">
+    <p class="flex gap-3 text-sm leading-6 text-red-600 phx-no-feedback:hidden" id={@id}>
       <%= render_slot(@inner_block) %>
     </p>
     """
