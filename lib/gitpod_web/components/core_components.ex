@@ -464,10 +464,10 @@ defmodule GitpodWeb.CoreComponents do
           aria-describedby={
             if @errors != [],
               do:
-                "#{Enum.map_join(Enum.to_list(0..(Enum.count(@errors) - 1)), ' ', &'#{@id}-error-#{&1}')} #{@id}-description",
+                '#{@errors |> Enum.with_index(fn _element, index -> "#{@id || @name}-error-#{index}" end) |> Enum.join(" ")} #{@id || @name}-description',
               else: "#{@id}-description"
           }
-          {@errors != [] && "aria-invalid='true'"}
+          aria-invalid={if @errors != [], do: "true", else: "false"}
           {@rest}
         />
         <div
@@ -481,7 +481,7 @@ defmodule GitpodWeb.CoreComponents do
         <%= render_slot(@help_text) %>
       </p>
       <div :if={@errors != []} class="mt-2">
-        <.error :for={{msg, i} <- @errors} id={"#{@id}-error-#{i}"}><%= msg %></.error>
+        <.error :for={{msg, i} <- @errors} id={"#{@id || @name}-error-#{i}"}><%= msg %></.error>
       </div>
     </div>
     """

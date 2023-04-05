@@ -3,7 +3,10 @@ defmodule GitpodWeb.SvelteLive do
 
   def render(assigns) do
     ~H"""
-    <LiveSvelte.render name="Example" props={%{number: @number}} />
+    <%!-- <LiveSvelte.render name="Example" props={%{number: @number}} /> --%>
+    <.button kind={:primary} phx-click="go">Send!</.button>
+    <.button kind={:secondary} phx-click="go">Send!</.button>
+    <.input value="" name="my-input" errors={["oh no!", "and non no"]} />
     """
   end
 

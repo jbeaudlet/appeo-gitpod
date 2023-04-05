@@ -7,19 +7,24 @@ defmodule Storybook.CoreComponents.Button do
     [
       %Variation{
         id: :default,
+        attributes: %{
+          kind: :secondary
+        },
         slots: ["Button"]
       },
       %Variation{
         id: :custom_class,
         attributes: %{
-          class: "rounded-full bg-indigo-500 hover:bg-indigo-600"
+          class: "rounded-full bg-indigo-500 hover:bg-indigo-600",
+          kind: :secondary
         },
         slots: ["Disabled"]
       },
       %Variation{
         id: :disabled,
         attributes: %{
-          disabled: true
+          disabled: true,
+          kind: :primary
         },
         slots: ["Disabled"]
       }
