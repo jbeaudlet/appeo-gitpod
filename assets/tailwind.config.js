@@ -3,6 +3,7 @@
 
 const plugin = require("tailwindcss/plugin");
 const colors = require("tailwindcss/colors");
+const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
 	content: ["./js/**/*.js", "../lib/*_web.ex", "../lib/*_web/**/*.*ex", "./svelte/**/*.svelte"],
@@ -11,10 +12,13 @@ module.exports = {
 			colors: {
 				primary: colors.blue,
 			},
+			fontFamily: {
+				sans: ["Inter var", ...defaultTheme.fontFamily.sans],
+			},
 		},
 	},
 	plugins: [
-		// require("@tailwindcss/forms"),
+		require("@tailwindcss/forms"),
 		plugin(({ addVariant }) =>
 			addVariant("phx-no-feedback", [".phx-no-feedback&", ".phx-no-feedback &"])
 		),

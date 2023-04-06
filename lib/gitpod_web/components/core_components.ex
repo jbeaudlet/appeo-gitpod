@@ -317,6 +317,7 @@ defmodule GitpodWeb.CoreComponents do
   attr :id, :any, default: nil
   attr :name, :any
   attr :label, :string, default: nil
+  attr :help_text, :string, default: nil
   attr :value, :any
 
   attr :type, :string,
@@ -335,7 +336,6 @@ defmodule GitpodWeb.CoreComponents do
   attr :rest, :global, include: ~w(autocomplete cols disabled form max maxlength min minlength
                                    pattern placeholder readonly required rows size step)
   slot :inner_block
-  slot :help_text
 
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
     assigns
@@ -352,32 +352,44 @@ defmodule GitpodWeb.CoreComponents do
 
     ~H"""
     <div phx-feedback-for={@name}>
-      <label class="flex items-center gap-4 text-sm leading-6 text-zinc-600">
-        <input type="hidden" name={@name} value="false" />
-        <input
-          type="checkbox"
-          id={@id || @name}
-          name={@name}
-          value="true"
-          checked={@checked}
-          class="w-4 h-4 border-gray-300 rounded text-primary-600 focus:ring-primary-600"
-          aria-describedby={
-            if @errors != [],
-              do:
-                "#{Enum.map_join(Enum.to_list(0..(Enum.count(@errors) - 1)), ' ', &'#{@id}-error-#{&1}')} #{@id}-description",
-              else: "#{@id}-description"
-          }
-          {@errors != [] && "aria-invalid='true'"}
-          {@rest}
-        />
-        <%= @label %>
-      </label>
-      <p :if={@help_text} class="mt-2 text-sm text-gray-500" id={"#{@id}-description"}>
-        <%= render_slot(@help_text) %>
-      </p>
-      <div :if={@errors != []} class="mt-2" id={"#{@id}-error"}>
-        <.error :for={msg <- @errors}><%= msg %></.error>
+      <input type="hidden" name={@name} value="false" />
+      <div class="relative flex items-start">
+        <div class="flex items-center h-6">
+          <input
+            type="checkbox"
+            id={@id || @name}
+            name={@name}
+            value="true"
+            checked={@checked}
+            class={[
+              "w-4 h-4 rounded",
+              @errors == [] && "border-gray-300 text-primary-600 focus:ring-primary-600",
+              @errors != [] && "border-red-300 text-red-600 focus:ring-red-600"
+            ]}
+            aria-describedby={
+              if @errors != [],
+                do:
+                  '#{@errors |> Enum.with_index(fn _element, index -> "#{@id || @name}-error-#{index}" end) |> Enum.join(" ")} #{@id || @name}-description',
+                else: "#{@id || @name}-description"
+            }
+            aria-invalid={if @errors != [], do: "true", else: "false"}
+            {@rest}
+          />
+        </div>
+        <div class="ml-3 text-sm leading-6">
+          <.label for={@id || @name}><%= @label %></.label>
+          <p :if={@help_text} class="text-sm text-gray-500" id={"#{@id || @name}-description"}>
+            <%= @help_text %>
+          </p>
+        </div>
       </div>
+      <.error
+        :for={{msg, i} <- Enum.with_index(@errors)}
+        :if={@errors != []}
+        id={"#{@id || @name}-error-#{i}"}
+      >
+        <%= msg %>
+      </.error>
     </div>
     """
   end
@@ -385,9 +397,9 @@ defmodule GitpodWeb.CoreComponents do
   def input(%{type: "select"} = assigns) do
     ~H"""
     <div phx-feedback-for={@name}>
-      <.label for={@id}><%= @label %></.label>
+      <.label for={@id || @name}><%= @label %></.label>
       <select
-        id={@id}
+        id={@id || @name}
         name={@name}
         class="block w-full px-3 py-2 mt-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-zinc-500 focus:border-zinc-500 sm:text-sm"
         multiple={@multiple}
@@ -404,42 +416,47 @@ defmodule GitpodWeb.CoreComponents do
   def input(%{type: "textarea"} = assigns) do
     ~H"""
     <div phx-feedback-for={@name}>
-      <.label for={@id}><%= @label %></.label>
+      <.label for={@id || @name}><%= @label %></.label>
       <div class="relative mt-2">
         <textarea
           id={@id || @name}
           name={@name}
           class={[
-            "block w-full rounded-md shadow-sm sm:py-1.5",
-            "text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6",
-            "phx-no-feedback:ring-gray-300 phx-no-feedback:focus:ring-2 phx-no-feedback:focus:ring-inset phx-no-feedback:focus:ring-primary-600",
-            "border-0 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600",
-            @errors != [] && "text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500"
+            "block w-full border-0 rounded-md shadow-sm sm:py-1.5 sm:text-sm sm:leading-6",
+            @errors == [] && "text-gray-900 placeholder:text-gray-400",
+            @errors == [] &&
+              "phx-no-feedback:ring-gray-300 phx-no-feedback:focus:ring-2 phx-no-feedback:focus:ring-inset phx-no-feedback:focus:ring-primary-600",
+            @errors == [] &&
+              "ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600",
+            @errors != [] &&
+              "pr-10 text-red-900 ring-1 ring-inset ring-red-300 placeholder:text-red-300 focus:ring-2 focus:ring-inset focus:ring-red-500"
           ]}
           aria-describedby={
             if @errors != [],
               do:
-                "#{Enum.map_join(Enum.to_list(0..(Enum.count(@errors) - 1)), ' ', &'#{@id}-error-#{&1}')} #{@id}-description",
-              else: "#{@id}-description"
+                '#{@errors |> Enum.with_index(fn _element, index -> "#{@id || @name}-error-#{index}" end) |> Enum.join(" ")} #{@id || @name}-description',
+              else: "#{@id || @name}-description"
           }
-          {@errors != [] && "aria-invalid='true'"}
+          aria-invalid={if @errors != [], do: "true", else: "false"}
           {@rest}
-        >
-          <%= Phoenix.HTML.Form.normalize_value("textarea", @value) %>
-        </textarea>
+        ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
         <div
           :if={@errors != []}
           class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
         >
-          <Heroicons.exclamation_circle mini class="w-5 h-5" />
+          <Heroicons.exclamation_circle mini class="w-5 h-5 text-red-500" />
         </div>
       </div>
-      <p :if={@help_text} class="mt-2 text-sm text-gray-500" id={"#{@id}-description"}>
-        <%= render_slot(@help_text) %>
+      <p :if={@help_text} class="mt-2 text-sm text-gray-500" id={"#{@id || @name}-description"}>
+        <%= @help_text %>
       </p>
-      <div :if={@errors != []} class="mt-2" id={"#{@id}-error"}>
-        <.error :for={msg <- @errors}><%= msg %></.error>
-      </div>
+      <.error
+        :for={{msg, i} <- Enum.with_index(@errors)}
+        :if={@errors != []}
+        id={"#{@id || @name}-error-#{i}"}
+      >
+        <%= msg %>
+      </.error>
     </div>
     """
   end
@@ -447,7 +464,7 @@ defmodule GitpodWeb.CoreComponents do
   def input(assigns) do
     ~H"""
     <div phx-feedback-for={@name}>
-      <.label for={@id}><%= @label %></.label>
+      <.label for={@id || @name}><%= @label %></.label>
       <div class="relative mt-2">
         <input
           type={@type}
@@ -455,17 +472,21 @@ defmodule GitpodWeb.CoreComponents do
           id={@id || @name}
           value={Phoenix.HTML.Form.normalize_value(@type, @value)}
           class={[
-            "block w-full rounded-md shadow-sm py-1.5",
-            "text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6",
-            "phx-no-feedback:ring-gray-300 phx-no-feedback:focus:ring-2 phx-no-feedback:focus:ring-inset phx-no-feedback:focus:ring-primary-600",
-            "border-0 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600",
-            @errors != [] && "text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500"
+            "block w-full border-0 rounded-md shadow-sm py-1.5 sm:text-sm sm:leading-6 focus-visible:outline-none",
+            "disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 disabled:ring-gray-200",
+            @errors == [] && "text-gray-900 placeholder:text-gray-400",
+            @errors == [] &&
+              "phx-no-feedback:ring-gray-300 phx-no-feedback:focus:ring-2 phx-no-feedback:focus:ring-inset phx-no-feedback:focus:ring-primary-600",
+            @errors == [] &&
+              "ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600",
+            @errors != [] &&
+              "pr-10 text-red-900 ring-1 ring-inset ring-red-300 placeholder:text-red-300 focus:ring-2 focus:ring-inset focus:ring-red-500"
           ]}
           aria-describedby={
             if @errors != [],
               do:
                 '#{@errors |> Enum.with_index(fn _element, index -> "#{@id || @name}-error-#{index}" end) |> Enum.join(" ")} #{@id || @name}-description',
-              else: "#{@id}-description"
+              else: "#{@id || @name}-description"
           }
           aria-invalid={if @errors != [], do: "true", else: "false"}
           {@rest}
@@ -474,15 +495,19 @@ defmodule GitpodWeb.CoreComponents do
           :if={@errors != []}
           class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
         >
-          <Heroicons.exclamation_circle mini class="w-5 h-5" />
+          <Heroicons.exclamation_circle mini class="w-5 h-5 text-red-500" />
         </div>
       </div>
-      <p :if={@help_text} class="mt-2 text-sm text-gray-500" id={"#{@id}-description"}>
-        <%= render_slot(@help_text) %>
+      <p :if={@help_text} class="mt-2 text-sm text-gray-500" id={"#{@id || @name}-description"}>
+        <%= @help_text %>
       </p>
-      <div :if={@errors != []} class="mt-2">
-        <.error :for={{msg, i} <- @errors} id={"#{@id || @name}-error-#{i}"}><%= msg %></.error>
-      </div>
+      <.error
+        :for={{msg, i} <- Enum.with_index(@errors)}
+        :if={@errors != []}
+        id={"#{@id || @name}-error-#{i}"}
+      >
+        <%= msg %>
+      </.error>
     </div>
     """
   end
@@ -510,7 +535,7 @@ defmodule GitpodWeb.CoreComponents do
 
   def error(assigns) do
     ~H"""
-    <p class="flex gap-3 text-sm leading-6 text-red-600 phx-no-feedback:hidden" id={@id}>
+    <p class="flex gap-3 text-sm leading-6 text-red-600" id={@id}>
       <%= render_slot(@inner_block) %>
     </p>
     """
