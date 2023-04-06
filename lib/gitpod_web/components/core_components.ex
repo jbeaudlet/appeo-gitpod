@@ -159,39 +159,74 @@ defmodule GitpodWeb.CoreComponents do
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       role="alert"
       class={[
-        "fixed hidden top-2 right-2 w-80 sm:w-96 z-50 rounded-lg p-3 shadow-md shadow-zinc-900/5 ring-1",
-        @kind == :info && "border-l-4 border-blue-400 bg-blue-50 text-blue-700",
-        @kind == :success && "border-l-4 border-green-400 bg-green-50 text-green-700",
-        @kind == :warning && "border-l-4 border-yellow-400 bg-yellow-50 text-yellow-700",
-        @kind == :error && "border-l-4 border-red-400 bg-red-50 text-red-700"
+        "fixed hidden top-2 right-2 w-80 sm:w-96 z-50 p-4 rounded-md",
+        @kind == :info && "border-blue-400 bg-blue-50 text-blue-700",
+        @kind == :success && "border-green-400 bg-green-50 text-green-700",
+        @kind == :warning && "border-yellow-400 bg-yellow-50 text-yellow-700",
+        @kind == :error && "border-red-400 bg-red-50 text-red-700"
       ]}
       {@rest}
     >
-      <p
-        :if={@title}
-        class={[
-          "flex items-center gap-1.5 text-[0.8125rem] font-semibold leading-6",
-          @kind == :info && "text-blue-800",
-          @kind == :success && "text-green-800",
-          @kind == :warning && "text-yellow-800",
-          @kind == :error && "text-red-800"
-        ]}
-      >
-        <Heroicons.information_circle :if={@kind == :info} mini class="w-4 h-4" />
-        <Heroicons.check_circle :if={@kind == :success} mini class="w-4 h-4" />
-        <Heroicons.exclamation_triangle :if={@kind == :warning} mini class="w-4 h-4" />
-        <Heroicons.exclamation_circle :if={@kind == :error} mini class="w-4 h-4" />
-        <%= @title %>
-      </p>
-      <p class="mt-2 text-[0.8125rem] leading-5"><%= msg %></p>
-      <button
-        :if={@close}
-        type="button"
-        class="absolute p-2 group top-2 right-1"
-        aria-label={gettext("close")}
-      >
-        <Heroicons.x_mark solid class="w-5 h-5 stroke-current opacity-40 group-hover:opacity-70" />
-      </button>
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <Heroicons.information_circle :if={@kind == :info} mini class="w-5 h-5 text-blue-400" />
+          <Heroicons.check_circle :if={@kind == :success} mini class="w-5 h-5 text-green-400" />
+          <Heroicons.exclamation_triangle
+            :if={@kind == :warning}
+            mini
+            class="w-5 h-5 text-yellow-400"
+          />
+          <Heroicons.exclamation_circle :if={@kind == :error} mini class="w-5 h-5 text-red-400" />
+        </div>
+        <div class="ml-3">
+          <h3
+            :if={@title}
+            class={[
+              "text-sm font-medium",
+              @kind == :info && "text-blue-800",
+              @kind == :success && "text-green-800",
+              @kind == :warning && "text-yellow-800",
+              @kind == :error && "text-red-800"
+            ]}
+          >
+            <%= @title %>
+          </h3>
+          <div()
+            :if={@title}
+            class={[
+              "mt-2 text-sm",
+              @kind == :info && "text-blue-700",
+              @kind == :success && "text-green-700",
+              @kind == :warning && "text-yellow-700",
+              @kind == :error && "text-red-700"
+            ]}
+          >
+            <%= msg %>
+          </div()>
+        </div>
+        <div :if={@close} class="pl-3 ml-auto">
+          <div class="-mx-1.5 -my-1.5">
+            <button
+              type="button"
+              class={[
+                "inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2",
+                @kind == :info &&
+                  "bg-blue-50 text-blue-500 hover:bg-blue-100 focus:ring-blue-600 focus:ring-offset-blue-50",
+                @kind == :success &&
+                  "bg-green-50 text-green-500 hover:bg-green-100 focus:ring-green-600 focus:ring-offset-green-50",
+                @kind == :warning &&
+                  "bg-yellow-50 text-yellow-500 hover:bg-yellow-100 focus:ring-yellow-600 focus:ring-offset-yellow-50",
+                @kind == :error &&
+                  "bg-red-50 text-red-500 hover:bg-red-100 focus:ring-red-600 focus:ring-offset-red-50"
+              ]}
+              aria-label={gettext("close")}
+            >
+              <span class="sr-only">{gettext("close")}</span>
+              <Heroicons.x_mark solid class="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     """
   end
