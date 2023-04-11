@@ -157,73 +157,55 @@ defmodule GitpodWeb.CoreComponents do
       id={@id}
       phx-mounted={@autoshow && show("##{@id}")}
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
-      role="alert"
-      class={[
-        "fixed hidden top-2 right-2 w-80 sm:w-96 z-50 p-4 rounded-md",
-        @kind == :info && "border-blue-400 bg-blue-50 text-blue-700",
-        @kind == :success && "border-green-400 bg-green-50 text-green-700",
-        @kind == :warning && "border-yellow-400 bg-yellow-50 text-yellow-700",
-        @kind == :error && "border-red-400 bg-red-50 text-red-700"
-      ]}
+      aria-live="assertive"
+      class="fixed inset-0 z-50 flex items-end hidden px-4 py-6 pointer-events-none sm:items-start sm:p-6"
       {@rest}
     >
-      <div class="flex">
-        <div class="flex-shrink-0">
-          <Heroicons.information_circle :if={@kind == :info} mini class="w-5 h-5 text-blue-400" />
-          <Heroicons.check_circle :if={@kind == :success} mini class="w-5 h-5 text-green-400" />
-          <Heroicons.exclamation_triangle
-            :if={@kind == :warning}
-            mini
-            class="w-5 h-5 text-yellow-400"
-          />
-          <Heroicons.exclamation_circle :if={@kind == :error} mini class="w-5 h-5 text-red-400" />
-        </div>
-        <div class="ml-3">
-          <h3
-            :if={@title}
-            class={[
-              "text-sm font-medium",
-              @kind == :info && "text-blue-800",
-              @kind == :success && "text-green-800",
-              @kind == :warning && "text-yellow-800",
-              @kind == :error && "text-red-800"
-            ]}
-          >
-            <%= @title %>
-          </h3>
-          <div()
-            :if={@title}
-            class={[
-              "mt-2 text-sm",
-              @kind == :info && "text-blue-700",
-              @kind == :success && "text-green-700",
-              @kind == :warning && "text-yellow-700",
-              @kind == :error && "text-red-700"
-            ]}
-          >
-            <%= msg %>
-          </div()>
-        </div>
-        <div :if={@close} class="pl-3 ml-auto">
-          <div class="-mx-1.5 -my-1.5">
-            <button
-              type="button"
-              class={[
-                "inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2",
-                @kind == :info &&
-                  "bg-blue-50 text-blue-500 hover:bg-blue-100 focus:ring-blue-600 focus:ring-offset-blue-50",
-                @kind == :success &&
-                  "bg-green-50 text-green-500 hover:bg-green-100 focus:ring-green-600 focus:ring-offset-green-50",
-                @kind == :warning &&
-                  "bg-yellow-50 text-yellow-500 hover:bg-yellow-100 focus:ring-yellow-600 focus:ring-offset-yellow-50",
-                @kind == :error &&
-                  "bg-red-50 text-red-500 hover:bg-red-100 focus:ring-red-600 focus:ring-offset-red-50"
-              ]}
-              aria-label={gettext("close")}
-            >
-              <span class="sr-only">{gettext("close")}</span>
-              <Heroicons.x_mark solid class="w-5 h-5" />
-            </button>
+      <div class="flex flex-col items-center w-full space-y-4 sm:items-end">
+        <div class="w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-lg pointer-events-auto ring-1 ring-black ring-opacity-5">
+          <div class="p-4">
+            <div class="flex items-start">
+              <div class="flex-shrink-0">
+                <Heroicons.information_circle
+                  :if={@kind == :info}
+                  outline
+                  class="w-6 h-6 text-blue-400"
+                />
+                <Heroicons.check_circle
+                  :if={@kind == :success}
+                  outline
+                  class="w-6 h-6 text-green-400"
+                />
+                <Heroicons.exclamation_triangle
+                  :if={@kind == :warning}
+                  outline
+                  class="w-6 h-6 text-yellow-400"
+                />
+                <Heroicons.exclamation_circle
+                  :if={@kind == :error}
+                  outline
+                  class="w-6 h-6 text-red-400"
+                />
+              </div>
+              <div class="ml-3 w-0 flex-1 pt-0.5">
+                <p :if={@title} class="text-sm font-medium text-gray-900">
+                  <%= @title %>
+                </p>
+                <div class="mt-1 text-sm text-gray-500">
+                  <%= msg %>
+                </div>
+              </div>
+              <div :if={@close} class="flex flex-shrink-0 ml-4">
+                <button
+                  type="button"
+                  class="inline-flex text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                  aria-label={gettext("close")}
+                >
+                  <span class="sr-only"><%= gettext("close") %></span>
+                  <Heroicons.x_mark solid class="w-5 h-5" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -258,6 +240,84 @@ defmodule GitpodWeb.CoreComponents do
       <%= gettext("Attempting to reconnect") %>
       <Heroicons.arrow_path class="inline w-3 h-3 ml-1 animate-spin" />
     </.flash>
+    """
+  end
+
+  @doc """
+  Renders alert notices.
+
+  ## Examples
+
+      <.alert kind={:error} title="There were 2 errors with your submission"} />
+        <ul role="list" class="pl-5 space-y-1 list-disc">
+          <li>Your password must be at least 8 characters</li>
+          <li>Your password must include at least one pro wrestling finishing move</li>
+        </ul>
+      </.alert>
+  """
+  attr :id, :string, default: "alert", doc: "the optional id of alert container"
+  attr :title, :string, default: nil
+
+  attr :kind, :atom,
+    values: [:info, :success, :warning, :error],
+    doc: "used for styling of alert"
+
+  attr :rest, :global, doc: "the arbitrary HTML attributes to add to the alert container"
+
+  slot :inner_block, doc: "the optional inner block that renders the alert message"
+
+  def alert(assigns) do
+    ~H"""
+    <div
+      id={@id}
+      class={[
+        "p-4 rounded-md",
+        @kind == :info && "border-blue-400 bg-blue-50 text-blue-700",
+        @kind == :success && "border-green-400 bg-green-50 text-green-700",
+        @kind == :warning && "border-yellow-400 bg-yellow-50 text-yellow-700",
+        @kind == :error && "border-red-400 bg-red-50 text-red-700"
+      ]}
+      {@rest}
+    >
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <Heroicons.information_circle :if={@kind == :info} mini class="w-5 h-5 text-blue-400" />
+          <Heroicons.check_circle :if={@kind == :success} mini class="w-5 h-5 text-green-400" />
+          <Heroicons.exclamation_triangle
+            :if={@kind == :warning}
+            mini
+            class="w-5 h-5 text-yellow-400"
+          />
+          <Heroicons.exclamation_circle :if={@kind == :error} mini class="w-5 h-5 text-red-400" />
+        </div>
+        <div class="ml-3">
+          <h3
+            :if={@title}
+            class={[
+              "text-sm font-medium",
+              @kind == :info && "text-blue-800",
+              @kind == :success && "text-green-800",
+              @kind == :warning && "text-yellow-800",
+              @kind == :error && "text-red-800"
+            ]}
+          >
+            <%= @title %>
+          </h3>
+          <div
+            :if={@inner_block}
+            class={[
+              "mt-2 text-sm",
+              @kind == :info && "text-blue-700",
+              @kind == :success && "text-green-700",
+              @kind == :warning && "text-yellow-700",
+              @kind == :error && "text-red-700"
+            ]}
+          >
+            <%= render_slot(@inner_block) %>
+          </div>
+        </div>
+      </div>
+    </div>
     """
   end
 
@@ -735,9 +795,9 @@ defmodule GitpodWeb.CoreComponents do
     JS.show(js,
       to: selector,
       transition:
-        {"transition-all transform ease-out duration-300",
-         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",
-         "opacity-100 translate-y-0 sm:scale-100"}
+        {"transform ease-out duration-300 transition",
+         "translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2",
+         "translate-y-0 opacity-100 sm:translate-x-0"}
     )
   end
 
@@ -745,10 +805,7 @@ defmodule GitpodWeb.CoreComponents do
     JS.hide(js,
       to: selector,
       time: 200,
-      transition:
-        {"transition-all transform ease-in duration-200",
-         "opacity-100 translate-y-0 sm:scale-100",
-         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"}
+      transition: {"transition ease-in duration-100", "opacity-100", "opacity-0"}
     )
   end
 
