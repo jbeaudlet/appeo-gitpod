@@ -40,6 +40,7 @@ defmodule GitpodWeb.CoreComponents do
   attr :on_confirm, JS, default: %JS{}
 
   slot :inner_block, required: true
+  slot :icon
   slot :title
   slot :subtitle
   slot :confirm
@@ -51,76 +52,86 @@ defmodule GitpodWeb.CoreComponents do
       id={@id}
       phx-mounted={@show && show_modal(@id)}
       phx-remove={hide_modal(@id)}
-      class="relative z-50 hidden"
+      class="relative z-10 hidden"
+      aria-labelledby={"#{@id}-title"}
+      aria-describedby={"#{@id}-description"}
+      role="dialog"
+      aria-modal="true"
+      tabindex="0"
     >
       <div
         id={"#{@id}-bg"}
         class="fixed inset-0 transition-opacity bg-gray-500/75"
         aria-hidden="true"
       />
-      <div
-        class="fixed inset-0 overflow-y-auto"
-        aria-labelledby={"#{@id}-title"}
-        aria-describedby={"#{@id}-description"}
-        role="dialog"
-        aria-modal="true"
-        tabindex="0"
-      >
-        <div class="flex items-center justify-center min-h-full">
-          <div class="w-full max-w-3xl p-4 sm:p-6 lg:py-8">
-            <.focus_wrap
-              id={"#{@id}-container"}
-              phx-mounted={@show && show_modal(@id)}
-              phx-window-keydown={hide_modal(@on_cancel, @id)}
-              phx-key="escape"
-              phx-click-away={hide_modal(@on_cancel, @id)}
-              class="relative hidden transition bg-white rounded-lg shadow-xl p-14 shadow-gray-700/10 ring-1 ring-gray-700/10"
-            >
-              <div class="absolute top-6 right-5">
-                <button
-                  phx-click={hide_modal(@on_cancel, @id)}
-                  type="button"
-                  class="flex-none p-3 -m-3 text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                  aria-label={gettext("close")}
-                >
-                  <Heroicons.x_mark solid class="w-5 h-5 stroke-current" />
-                </button>
+      <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
+          <.focus_wrap
+            id={"#{@id}-container"}
+            class="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
+            phx-mounted={@show && show_modal(@id)}
+            phx-window-keydown={hide_modal(@on_cancel, @id)}
+            phx-key="escape"
+            phx-click-away={hide_modal(@on_cancel, @id)}
+          >
+            <div class="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
+              <button
+                phx-click={hide_modal(@on_cancel, @id)}
+                type="button"
+                class="text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                aria-label={gettext("close")}
+              >
+                <span class="sr-only"><%= gettext("close") %></span>
+                <Heroicons.x_mark solid class="w-6 h-6" />
+              </button>
+            </div>
+            <div id={"#{@id}-content"} class="sm:flex sm:items-start">
+              <div
+                :if={@icon != []}
+                class="flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto bg-red-100 rounded-full sm:mx-0 sm:h-10 sm:w-10"
+              >
+                <%= render_slot(@icon) %>
               </div>
-              <div id={"#{@id}-content"}>
-                <header :if={@title != []}>
-                  <h1 id={"#{@id}-title"} class="text-lg font-medium leading-8 text-gray-900">
+              <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                <header :if={@title != [] or @subtitle != []}>
+                  <h3 id={"#{@id}-title"} class="text-base font-semibold leading-6 text-gray-900">
                     <%= render_slot(@title) %>
-                  </h1>
+                  </h3>
                   <p
                     :if={@subtitle != []}
                     id={"#{@id}-description"}
-                    class="mt-2 text-sm leading-6 text-gray-600"
+                    class="mt-1 text-sm leading-6 text-gray-600"
                   >
                     <%= render_slot(@subtitle) %>
                   </p>
                 </header>
-                <%= render_slot(@inner_block) %>
-                <div :if={@confirm != [] or @cancel != []} class="flex items-center gap-5 mb-4 ml-6">
-                  <.button
-                    :for={confirm <- @confirm}
-                    id={"#{@id}-confirm"}
-                    phx-click={@on_confirm}
-                    phx-disable-with
-                    class="px-3 py-2"
-                  >
-                    <%= render_slot(confirm) %>
-                  </.button>
-                  <.link
-                    :for={cancel <- @cancel}
-                    phx-click={hide_modal(@on_cancel, @id)}
-                    class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-700 focus:ring-primary-500 focus:ring-offset-2"
-                  >
-                    <%= render_slot(cancel) %>
-                  </.link>
+                <div class="mt-2 text-gray-500">
+                  <%= render_slot(@inner_block) %>
                 </div>
               </div>
-            </.focus_wrap>
-          </div>
+            </div>
+            <div
+              :if={@confirm != [] or @cancel != []}
+              class="fmt-5 sm:mt-4 sm:flex sm:flex-row-reverse"
+            >
+              <.button
+                :for={confirm <- @confirm}
+                id={"#{@id}-confirm"}
+                phx-click={@on_confirm}
+                phx-disable-with
+                class="inline-flex justify-center w-full sm:ml-3 sm:w-auto"
+              >
+                <%= render_slot(confirm) %>
+              </.button>
+              <.link
+                :for={cancel <- @cancel}
+                phx-click={hide_modal(@on_cancel, @id)}
+                class="inline-flex justify-center w-full px-3 py-2 mt-3 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+              >
+                <%= render_slot(cancel) %>
+              </.link>
+            </div>
+          </.focus_wrap>
         </div>
       </div>
     </div>
@@ -811,24 +822,26 @@ defmodule GitpodWeb.CoreComponents do
 
   def show_modal(js \\ %JS{}, id) when is_binary(id) do
     js
-    |> JS.show(to: "##{id}")
+    |> JS.show(to: "##{id}", transition: {"ease-out duration-300", "opacity-0", "opacity-100"})
     |> JS.show(
-      to: "##{id}-bg",
-      transition: {"transition-all transform ease-out duration-300", "opacity-0", "opacity-100"}
+      to: "##{id}-container",
+      transition:
+        {"ease-out duration-300", "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",
+         "opacity-100 translate-y-0 sm:scale-100"}
     )
-    |> show("##{id}-container")
     |> JS.add_class("overflow-hidden", to: "body")
     |> JS.focus_first(to: "##{id}-content")
   end
 
   def hide_modal(js \\ %JS{}, id) do
     js
+    |> JS.hide(to: "##{id}", transition: {"ease-in duration-200", "opacity-100", "opacity-0"})
     |> JS.hide(
-      to: "##{id}-bg",
-      transition: {"transition-all transform ease-in duration-200", "opacity-100", "opacity-0"}
+      to: "##{id}-container",
+      transition:
+        {"ease-in duration-200", "opacity-100 translate-y-0 sm:scale-100",
+         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"}
     )
-    |> hide("##{id}-container")
-    |> JS.hide(to: "##{id}", transition: {"block", "block", "hidden"})
     |> JS.remove_class("overflow-hidden", to: "body")
     |> JS.pop_focus()
   end
