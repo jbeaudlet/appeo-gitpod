@@ -190,7 +190,7 @@ defmodule GitpodWeb.CoreComponents do
                 <p :if={@title} class="text-sm font-medium text-gray-900">
                   <%= @title %>
                 </p>
-                <div class="mt-1 text-sm text-gray-500">
+                <div class={["text-sm text-gray-500", @title && "mt-1"]}>
                   <%= msg %>
                 </div>
               </div>
