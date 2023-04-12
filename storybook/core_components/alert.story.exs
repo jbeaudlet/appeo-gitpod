@@ -9,28 +9,32 @@ defmodule Storybook.CoreComponents.Alert do
       %Variation{
         id: :info_no_title,
         attributes: %{
-          kind: :info,
-          autoshow: false
+          kind: :info
         },
         slots: ["Info message"]
       },
       %Variation{
-        id: :error_with_title,
+        id: :error_with_title_and_slot,
         attributes: %{
           kind: :error,
-          autoshow: false,
-          title: "Alert title"
+          title: "There were 2 errors with your submission"
         },
-        slots: ["Error message"]
+        slots: [
+          """
+          <ul role="list" class="pl-5 space-y-1 list-disc">
+            <li>Your password must be at least 8 characters</li>
+            <li>Your password must include at least one pro wrestling finishing move</li>
+          </ul>
+          """
+        ]
       },
       %Variation{
-        id: :no_close_button,
+        id: :info_with_title,
         attributes: %{
           kind: :info,
-          autoshow: false,
-          close: false
+          title: "Info message"
         },
-        slots: ["Info message"]
+        slots: ["A new software update is available. See what’s new in version 2.0.4."]
       }
     ]
   end

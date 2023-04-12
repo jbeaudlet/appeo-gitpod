@@ -13,7 +13,6 @@ defmodule GitpodWeb.CoreComponents do
 
   alias Phoenix.LiveView.JS
   import GitpodWeb.Gettext
-  import Phoenix.HTML, only: [html_escape: 1]
 
   @doc """
   Renders a modal.
@@ -306,7 +305,8 @@ defmodule GitpodWeb.CoreComponents do
           <div
             :if={@inner_block}
             class={[
-              "mt-2 text-sm",
+              "text-sm",
+              @title && "mt-2",
               @kind == :info && "text-blue-700",
               @kind == :success && "text-green-700",
               @kind == :warning && "text-yellow-700",
@@ -386,9 +386,9 @@ defmodule GitpodWeb.CoreComponents do
         "text-sm font-semibold",
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
         @kind == :primary &&
-          "text-white bg-primary-600 active:text-white/80 not:disabled:hover:bg-primary-500 focus-visible:outline-primary-600 dark:bg-primary-500 dark:active:text-white/80 dark:not:disabled:hover:bg-primary-400 dark:focus-visible:outline-primary-500",
+          "text-white bg-primary-600 active:text-white/80 enabled:hover:bg-primary-500 focus-visible:outline-primary-600 dark:bg-primary-500 dark:active:text-white/80 dark:enabled:hover:bg-primary-400 dark:focus-visible:outline-primary-500",
         @kind == :secondary &&
-          "text-gray-900 bg-white ring-1 ring-inset ring-gray-300 active:text-gray-900/80 not:disabled:hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:active:text-white/80 dark:not:disabled:hover:bg-white/20",
+          "text-gray-900 bg-white ring-1 ring-inset ring-gray-300 active:text-gray-900/80 enabled:hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:active:text-white/80 dark:enabled:hover:bg-white/20",
         @class
       ]}
       {@rest}
