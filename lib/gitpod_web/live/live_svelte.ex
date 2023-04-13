@@ -13,7 +13,7 @@ defmodule GitpodWeb.SvelteLive do
       help_text="C'est une aide"
     />
     <.button disabled type="button">Boutton</.button>
-    <.button kind={:secondary} type="button">Boutton</.button>
+    <%!-- <.button kind={:secondary} type="button">Boutton</.button> --%>
     """
   end
 

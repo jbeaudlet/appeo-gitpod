@@ -39,6 +39,11 @@ defmodule GitpodWeb.CoreComponents do
   attr :on_cancel, JS, default: %JS{}
   attr :on_confirm, JS, default: %JS{}
 
+  attr :kind, :atom,
+    values: [:none, :info, :success, :warning, :error],
+    default: :none,
+    doc: "used for styling the color backrgound icon slot"
+
   slot :inner_block, required: true
   slot :icon
   slot :title
@@ -88,7 +93,13 @@ defmodule GitpodWeb.CoreComponents do
             <div id={"#{@id}-content"} class="sm:flex sm:items-start">
               <div
                 :if={@icon != []}
-                class="flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto bg-red-100 rounded-full sm:mx-0 sm:h-10 sm:w-10"
+                class={[
+                  "flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto rounded-full sm:mx-0 sm:h-10 sm:w-10",
+                  @kind == :info && "bg-blue-100",
+                  @kind == :success && "bg-green-100",
+                  @kind == :warning && "bg-yellow-100",
+                  @kind == :error && "bg-red-100"
+                ]}
               >
                 <%= render_slot(@icon) %>
               </div>
@@ -119,6 +130,7 @@ defmodule GitpodWeb.CoreComponents do
                 id={"#{@id}-confirm"}
                 phx-click={@on_confirm}
                 phx-disable-with
+                color={if @kind == :error, do: "danger", else: "primary"}
                 class="inline-flex justify-center w-full sm:ml-3 sm:w-auto"
               >
                 <%= render_slot(confirm) %>
@@ -126,7 +138,10 @@ defmodule GitpodWeb.CoreComponents do
               <.link
                 :for={cancel <- @cancel}
                 phx-click={hide_modal(@on_cancel, @id)}
-                class="inline-flex justify-center w-full px-3 py-2 mt-3 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                class={[
+                  "inline-flex justify-center w-full sm:mt-0 sm:w-auto",
+                  get_button_classes("white", "link")
+                ]}
               >
                 <%= render_slot(cancel) %>
               </.link>
@@ -241,7 +256,7 @@ defmodule GitpodWeb.CoreComponents do
     <.flash
       id="disconnected"
       kind={:error}
-      title="We can't find the internet"
+      title={gettext("We can't find the internet")}
       close={false}
       autoshow={false}
       phx-disconnected={show("#disconnected")}
@@ -379,9 +394,9 @@ defmodule GitpodWeb.CoreComponents do
   attr :type, :string, default: nil
   attr :class, :string, default: nil
 
-  attr :kind, :atom,
-    values: [:primary, :secondary],
-    default: :primary,
+  attr :color, :string,
+    values: ~w(primary white danger),
+    default: "primary",
     doc: "used for styling"
 
   attr :rest, :global, include: ~w(disabled form name value)
@@ -393,13 +408,7 @@ defmodule GitpodWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded-md py-2 px-3 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed",
-        "text-sm font-semibold",
-        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
-        @kind == :primary &&
-          "text-white bg-primary-600 active:text-white/80 enabled:hover:bg-primary-500 focus-visible:outline-primary-600 dark:bg-primary-500 dark:active:text-white/80 dark:enabled:hover:bg-primary-400 dark:focus-visible:outline-primary-500",
-        @kind == :secondary &&
-          "text-gray-900 bg-white ring-1 ring-inset ring-gray-300 active:text-gray-900/80 enabled:hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:active:text-white/80 dark:enabled:hover:bg-white/20",
+        get_button_classes(@color, "button"),
         @class
       ]}
       {@rest}
@@ -798,6 +807,29 @@ defmodule GitpodWeb.CoreComponents do
       </.link>
     </div>
     """
+  end
+
+  ## Helpers
+
+  defp get_button_classes(color, type) do
+    default =
+      "phx-submit-loading:opacity-75 rounded-md py-2 px-3 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+
+    enabled = (type == "button" && "enabled:") || ""
+
+    case color do
+      "primary" ->
+        "#{default} text-white bg-primary-600 active:text-white/80 #{enabled}hover:bg-primary-500 dark:#{enabled}hover:bg-primary-400 focus-visible:outline-primary-600 dark:bg-primary-500 dark:active:text-white/80 dark:focus-visible:outline-primary-500"
+
+      "white" ->
+        "#{default} text-gray-900 bg-white ring-1 ring-inset ring-gray-300 active:text-gray-900/80 #{enabled}hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:active:text-white/80 dark:#{enabled}hover:bg-white/20"
+
+      "danger" ->
+        "#{default} text-white bg-red-600 active:text-white/80 #{enabled}hover:bg-red-500 focus-visible:outline-red-600 dark:bg-red-500 dark:active:text-white/80 dark:#{enabled}hover:bg-red-400 dark:focus-visible:outline-red-500"
+
+      _ ->
+        ""
+    end
   end
 
   ## JS Commands

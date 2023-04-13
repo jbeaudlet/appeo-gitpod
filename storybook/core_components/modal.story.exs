@@ -31,13 +31,14 @@ defmodule Storybook.CoreComponents.Modal do
       %Variation{
         id: :with_actions,
         attributes: %{
-          :on_confirm => {:eval, ~s|hide_modal("modal-single-with-actions")|}
+          :on_confirm => {:eval, ~s|hide_modal("modal-single-with-actions")|},
+          kind: :error
         },
         slots: [
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-          "<:title>Are you sure?</:title>",
-          "<:subtitle>Subtitle</:subtitle>",
-          "<:confirm>OK</:confirm>",
+          "Are you sure you want to deactivate your account? All of your data will be permanently removed. This action cannot be undone.",
+          "<:icon><Heroicons.exclamation_triangle outline class='w-6 h-6 text-red-600' /></:icon>",
+          "<:title>Deactivate account</:title>",
+          "<:confirm>Deactivate</:confirm>",
           "<:cancel>Cancel</:cancel>"
         ]
       }
