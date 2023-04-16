@@ -5,5 +5,9 @@ defmodule GitpodWeb.Storybook do
     # assets path are remote path, not local file-system paths
     css_path: "/assets/storybook.css",
     js_path: "/assets/storybook.js",
-    sandbox_class: "font-sans"
+    sandbox_class: "font-sans",
+    themes: [
+      default: [name: "light"],
+      dark: [name: "dark", dropdown_class: "text-slate-800"]
+    ]
 end
