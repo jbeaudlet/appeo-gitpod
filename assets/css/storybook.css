@@ -12,7 +12,7 @@
     font-family: ui-sans-serif, system-ui;
   } */
 
-	.dark .lsb:has(> .theme-dark) {
-		@apply bg-slate-900;
+	.dark div:has(> .theme-dark) {
+		@apply bg-slate-950;
 	}
 }

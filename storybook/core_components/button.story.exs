@@ -42,6 +42,14 @@ defmodule Storybook.CoreComponents.Button do
           kind: :secondary
         },
         slots: ["Disabled"]
+      },
+      %Variation{
+        id: :link_primary,
+        attributes: %{
+          link: true,
+          kind: :primary
+        },
+        slots: ["Link"]
       }
     ]
   end

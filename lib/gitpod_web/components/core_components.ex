@@ -73,7 +73,7 @@ defmodule GitpodWeb.CoreComponents do
         <div class="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
           <.focus_wrap
             id={"#{@id}-container"}
-            class="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
+            class="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl dark:bg-slate-900 dark:text-gray-400 dark:shadow-slate-700/70 sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
             phx-mounted={@show && show_modal(@id)}
             phx-window-keydown={hide_modal(@on_cancel, @id)}
             phx-key="escape"
@@ -83,7 +83,7 @@ defmodule GitpodWeb.CoreComponents do
               <button
                 phx-click={hide_modal(@on_cancel, @id)}
                 type="button"
-                class="text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                class="text-gray-400 transition-all bg-white rounded-md hover:text-gray-500 focus:ring-offset-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-slate-900 dark:focus:ring-primary-500/50 dark:focus:ring-offset-slate-900"
                 aria-label={gettext("close")}
               >
                 <span class="sr-only"><%= gettext("close") %></span>
@@ -135,16 +135,14 @@ defmodule GitpodWeb.CoreComponents do
               >
                 <%= render_slot(confirm) %>
               </.button>
-              <.link
+              <.button
                 :for={cancel <- @cancel}
                 phx-click={hide_modal(@on_cancel, @id)}
-                class={[
-                  "inline-flex justify-center w-full sm:mt-0 sm:w-auto",
-                  get_button_classes("white", "link")
-                ]}
+                class="inline-flex justify-center w-full sm:mt-0 sm:w-auto"
+                color="secondary"
               >
                 <%= render_slot(cancel) %>
-              </.link>
+              </.button>
             </div>
           </.focus_wrap>
         </div>
@@ -384,24 +382,40 @@ defmodule GitpodWeb.CoreComponents do
   end
 
   @doc """
-  Renders a button.
+  Renders a button or a link styled like a button.
 
   ## Examples
 
       <.button>Send!</.button>
       <.button phx-click="go" class="ml-2">Send!</.button>
   """
+  attr :link, :boolean, default: false, doc: "if true, display a link styled like a button"
+
   attr :type, :string, default: nil
   attr :class, :string, default: nil
 
   attr :color, :string,
-    values: ~w(primary white danger),
+    values: ~w(primary secondary danger),
     default: "primary",
     doc: "used for styling"
 
   attr :rest, :global, include: ~w(disabled form name value)
 
   slot :inner_block, required: true
+
+  def button(%{link: _} = assigns) do
+    ~H"""
+    <.link
+      class={[
+        get_button_classes(@color, "link"),
+        @class
+      ]}
+      {@rest}
+    >
+      <%= render_slot(@inner_block) %>
+    </.link>
+    """
+  end
 
   def button(assigns) do
     ~H"""
@@ -815,20 +829,34 @@ defmodule GitpodWeb.CoreComponents do
     default =
       "phx-submit-loading:opacity-75 rounded-md py-2 px-3 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
 
-    enabled = (type == "button" && "enabled:") || ""
+    if type == "button" do
+      case color do
+        "primary" ->
+          "#{default} text-white bg-primary-600 active:text-white/80 enabled:hover:bg-primary-500 dark:enabled:hover:bg-primary-400 focus-visible:outline-primary-600 dark:bg-primary-500 dark:active:text-white/80 dark:focus-visible:outline-primary-500"
 
-    case color do
-      "primary" ->
-        "#{default} text-white bg-primary-600 active:text-white/80 #{enabled}hover:bg-primary-500 dark:#{enabled}hover:bg-primary-400 focus-visible:outline-primary-600 dark:bg-primary-500 dark:active:text-white/80 dark:focus-visible:outline-primary-500"
+        "secondary" ->
+          "#{default} text-gray-900 bg-white ring-1 ring-gray-300 active:text-gray-900/80 enabled:hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:active:text-white/80 dark:enabled:hover:bg-white/20"
 
-      "white" ->
-        "#{default} text-gray-900 bg-white ring-1 ring-inset ring-gray-300 active:text-gray-900/80 #{enabled}hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:active:text-white/80 dark:#{enabled}hover:bg-white/20"
+        "danger" ->
+          "#{default} text-white bg-red-600 active:text-white/80 enabled:hover:bg-red-500 focus-visible:outline-red-600 dark:bg-red-500 dark:active:text-white/80 dark:enabled:hover:bg-red-400 dark:focus-visible:outline-red-500"
 
-      "danger" ->
-        "#{default} text-white bg-red-600 active:text-white/80 #{enabled}hover:bg-red-500 focus-visible:outline-red-600 dark:bg-red-500 dark:active:text-white/80 dark:#{enabled}hover:bg-red-400 dark:focus-visible:outline-red-500"
+        _ ->
+          ""
+      end
+    else
+      case color do
+        "primary" ->
+          "#{default} text-white bg-primary-600 active:text-white/80 hover:bg-primary-500 dark:hover:bg-primary-400 focus-visible:outline-primary-600 dark:bg-primary-500 dark:active:text-white/80 dark:focus-visible:outline-primary-500"
 
-      _ ->
-        ""
+        "secondary" ->
+          "#{default} text-gray-900 bg-white ring-1 ring-gray-300 active:text-gray-900/80 hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:active:text-white/80 dark:hover:bg-white/20"
+
+        "danger" ->
+          "#{default} text-white bg-red-600 active:text-white/80 hover:bg-red-500 focus-visible:outline-red-600 dark:bg-red-500 dark:active:text-white/80 dark:hover:bg-red-400 dark:focus-visible:outline-red-500"
+
+        _ ->
+          ""
+      end
     end
   end
 
