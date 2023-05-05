@@ -83,7 +83,7 @@ defmodule GitpodWeb.CoreComponents do
               <button
                 phx-click={hide_modal(@on_cancel, @id)}
                 type="button"
-                class="text-gray-400 transition-all bg-white rounded-md hover:text-gray-500 focus:ring-offset-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-slate-900 dark:focus:ring-primary-500/50 dark:focus:ring-offset-slate-900"
+                class="text-gray-400 transition-all bg-white rounded-md hover:text-gray-500 focus:ring-offset-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-slate-900 dark:focus:ring-gray-500"
                 aria-label={gettext("close")}
               >
                 <span class="sr-only"><%= gettext("close") %></span>
@@ -832,7 +832,7 @@ defmodule GitpodWeb.CoreComponents do
           "#{default} text-white bg-primary-600 active:text-white/80 enabled:hover:bg-primary-500 dark:enabled:hover:bg-primary-400 focus-visible:outline-primary-600 dark:bg-primary-500 dark:active:text-white/80 dark:focus-visible:outline-primary-500"
 
         "secondary" ->
-          "#{default} text-gray-900 bg-white ring-1 ring-gray-300 active:text-gray-900/80 enabled:hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:active:text-white/80 dark:enabled:hover:bg-white/20"
+          "#{default} text-gray-900 bg-white ring-1 ring-gray-300 active:text-gray-900/80 enabled:hover:bg-gray-50 focus-visible:outline-gray-600 dark:bg-white/10 dark:text-white dark:active:text-white/80 dark:enabled:hover:bg-white/20 dark:focus-visible:outline-gray-500"
 
         "danger" ->
           "#{default} text-white bg-red-600 active:text-white/80 enabled:hover:bg-red-500 focus-visible:outline-red-600 dark:bg-red-500 dark:active:text-white/80 dark:enabled:hover:bg-red-400 dark:focus-visible:outline-red-500"
@@ -846,7 +846,7 @@ defmodule GitpodWeb.CoreComponents do
           "#{default} text-white bg-primary-600 active:text-white/80 hover:bg-primary-500 dark:hover:bg-primary-400 focus-visible:outline-primary-600 dark:bg-primary-500 dark:active:text-white/80 dark:focus-visible:outline-primary-500"
 
         "secondary" ->
-          "#{default} text-gray-900 bg-white ring-1 ring-gray-300 active:text-gray-900/80 hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:active:text-white/80 dark:hover:bg-white/20"
+          "#{default} text-gray-900 bg-white ring-1 ring-gray-300 active:text-gray-900/80 hover:bg-gray-50 dark:bg-white/10 focus-visible:outline-gray-600 dark:text-white dark:active:text-white/80 dark:hover:bg-white/20 dark:focus-visible:outline-gray-500"
 
         "danger" ->
           "#{default} text-white bg-red-600 active:text-white/80 hover:bg-red-500 focus-visible:outline-red-600 dark:bg-red-500 dark:active:text-white/80 dark:hover:bg-red-400 dark:focus-visible:outline-red-500"
