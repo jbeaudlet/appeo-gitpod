@@ -295,46 +295,61 @@ defmodule GitpodWeb.CoreComponents do
       id={@id}
       class={[
         "p-4 rounded-md",
-        @kind == :info && "border-blue-400 bg-blue-50 text-blue-700",
-        @kind == :success && "border-green-400 bg-green-50 text-green-700",
-        @kind == :warning && "border-yellow-400 bg-yellow-50 text-yellow-700",
-        @kind == :error && "border-red-400 bg-red-50 text-red-700"
+        @kind == :info &&
+          "border-blue-400 bg-blue-50 text-blue-700 dark:bg-blue-700 dark:text-blue-50",
+        @kind == :success &&
+          "border-green-400 bg-green-50 text-green-700 dark:bg-green-700 dark:text-green-50",
+        @kind == :warning &&
+          "border-yellow-400 bg-yellow-50 text-yellow-700 dark:bg-yellow-700 dark:text-yellow-50",
+        @kind == :error && "border-red-400 bg-red-50 text-red-700 dark:bg-red-700 dark:text-red-50"
       ]}
       {@rest}
     >
       <div class="flex">
         <div class="flex-shrink-0">
-          <Heroicons.information_circle :if={@kind == :info} mini class="w-5 h-5 text-blue-400" />
-          <Heroicons.check_circle :if={@kind == :success} mini class="w-5 h-5 text-green-400" />
+          <Heroicons.information_circle
+            :if={@kind == :info}
+            mini
+            class="w-5 h-5 text-blue-400 dark:text-blue-200"
+          />
+          <Heroicons.check_circle
+            :if={@kind == :success}
+            mini
+            class="w-5 h-5 text-green-400 dark:text-green-200"
+          />
           <Heroicons.exclamation_triangle
             :if={@kind == :warning}
             mini
-            class="w-5 h-5 text-yellow-400"
+            class="w-5 h-5 text-yellow-400 dark:text-yellow-200"
           />
-          <Heroicons.exclamation_circle :if={@kind == :error} mini class="w-5 h-5 text-red-400" />
+          <Heroicons.exclamation_circle
+            :if={@kind == :error}
+            mini
+            class="w-5 h-5 text-red-400 dark:text-red-200"
+          />
         </div>
         <div class="ml-3">
           <h3
             :if={@title}
             class={[
               "text-sm font-medium",
-              @kind == :info && "text-blue-800",
-              @kind == :success && "text-green-800",
-              @kind == :warning && "text-yellow-800",
-              @kind == :error && "text-red-800"
+              @kind == :info && "text-blue-800 dark:text-blue-100",
+              @kind == :success && "text-green-800 dark:text-green-100",
+              @kind == :warning && "text-yellow-800 dark:text-yellow-100",
+              @kind == :error && "text-red-800 dark:text-red-100"
             ]}
           >
             <%= @title %>
           </h3>
           <div
-            :if={@inner_block}
+            :if={@inner_block != []}
             class={[
               "text-sm",
               @title && "mt-2",
-              @kind == :info && "text-blue-700",
-              @kind == :success && "text-green-700",
-              @kind == :warning && "text-yellow-700",
-              @kind == :error && "text-red-700"
+              @kind == :info && "text-blue-700 dark:text-blue-200",
+              @kind == :success && "text-green-700 dark:text-green-200",
+              @kind == :warning && "text-yellow-700 dark:text-yellow-200",
+              @kind == :error && "text-red-700 dark:text-red-200"
             ]}
           >
             <%= render_slot(@inner_block) %>
