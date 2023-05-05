@@ -130,7 +130,7 @@ defmodule GitpodWeb.CoreComponents do
                 id={"#{@id}-confirm"}
                 phx-click={@on_confirm}
                 phx-disable-with
-                color={if @kind == :error, do: "danger", else: "primary"}
+                kind={if @kind == :error, do: "danger", else: "primary"}
                 class="inline-flex justify-center w-full sm:ml-3 sm:w-auto"
               >
                 <%= render_slot(confirm) %>
@@ -139,7 +139,7 @@ defmodule GitpodWeb.CoreComponents do
                 :for={cancel <- @cancel}
                 phx-click={hide_modal(@on_cancel, @id)}
                 class="inline-flex justify-center w-full sm:mt-0 sm:w-auto"
-                color="secondary"
+                kind="secondary"
               >
                 <%= render_slot(cancel) %>
               </.button>
@@ -394,7 +394,7 @@ defmodule GitpodWeb.CoreComponents do
   attr :type, :string, default: nil
   attr :class, :string, default: nil
 
-  attr :color, :string,
+  attr :kind, :string,
     values: ~w(primary secondary danger),
     default: "primary",
     doc: "used for styling"
@@ -403,32 +403,29 @@ defmodule GitpodWeb.CoreComponents do
 
   slot :inner_block, required: true
 
-  def button(%{link: _} = assigns) do
-    ~H"""
-    <.link
-      class={[
-        get_button_classes(@color, "link"),
-        @class
-      ]}
-      {@rest}
-    >
-      <%= render_slot(@inner_block) %>
-    </.link>
-    """
-  end
-
   def button(assigns) do
     ~H"""
     <button
+      :if={!@link}
       type={@type}
       class={[
-        get_button_classes(@color, "button"),
+        get_button_classes(@kind, "button"),
         @class
       ]}
       {@rest}
     >
       <%= render_slot(@inner_block) %>
     </button>
+    <.link
+      :if={@link}
+      class={[
+        get_button_classes(@kind, "link"),
+        @class
+      ]}
+      {@rest}
+    >
+      <%= render_slot(@inner_block) %>
+    </.link>
     """
   end
 

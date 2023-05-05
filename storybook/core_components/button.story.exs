@@ -5,51 +5,89 @@ defmodule Storybook.CoreComponents.Button do
 
   def variations do
     [
-      %Variation{
-        id: :primary,
-        attributes: %{
-          kind: :primary
-        },
-        slots: ["Button"]
+      %VariationGroup{
+        id: :colors,
+        description: "Different color buttons",
+        variations: [
+          %Variation{
+            id: :primary,
+            attributes: %{kind: "primary"},
+            slots: ["primary button"]
+          },
+          %Variation{
+            id: :secondary,
+            attributes: %{kind: "secondary"},
+            slots: ["secondary button"]
+          },
+          %Variation{
+            id: :danger,
+            attributes: %{kind: "danger"},
+            slots: ["danger button"]
+          }
+        ]
       },
-      %Variation{
-        id: :secondary,
-        attributes: %{
-          kind: :secondary
-        },
-        slots: ["Button"]
+      %VariationGroup{
+        id: :classes,
+        description: "Buttons with classes",
+        variations: [
+          %Variation{
+            id: :primary,
+            attributes: %{class: "rounded-full", kind: "primary"},
+            slots: ["primary classes"]
+          },
+          %Variation{
+            id: :secondary,
+            attributes: %{class: "rounded-full", kind: "secondary"},
+            slots: ["secondary classes"]
+          },
+          %Variation{
+            id: :danger,
+            attributes: %{class: "rounded-full", kind: "danger"},
+            slots: ["danger classes"]
+          }
+        ]
       },
-      %Variation{
-        id: :custom_class,
-        attributes: %{
-          class: "rounded-full",
-          kind: :primary
-        },
-        slots: ["rounded class"]
+      %VariationGroup{
+        id: :disabled,
+        description: "Disabled buttons",
+        variations: [
+          %Variation{
+            id: :primary,
+            attributes: %{disabled: true, kind: "primary"},
+            slots: ["primary classes"]
+          },
+          %Variation{
+            id: :secondary,
+            attributes: %{disabled: true, kind: "secondary"},
+            slots: ["secondary classes"]
+          },
+          %Variation{
+            id: :danger,
+            attributes: %{disabled: true, kind: "danger"},
+            slots: ["danger classes"]
+          }
+        ]
       },
-      %Variation{
-        id: :disabled_primary,
-        attributes: %{
-          disabled: true,
-          kind: :primary
-        },
-        slots: ["Disabled"]
-      },
-      %Variation{
-        id: :disabled_secondary,
-        attributes: %{
-          disabled: true,
-          kind: :secondary
-        },
-        slots: ["Disabled"]
-      },
-      %Variation{
-        id: :link_primary,
-        attributes: %{
-          link: true,
-          kind: :primary
-        },
-        slots: ["Link"]
+      %VariationGroup{
+        id: :link,
+        description: "Link styles as buttons",
+        variations: [
+          %Variation{
+            id: :primary,
+            attributes: %{link: true, kind: "primary"},
+            slots: ["primary link"]
+          },
+          %Variation{
+            id: :secondary,
+            attributes: %{link: true, kind: "secondary"},
+            slots: ["secondary link"]
+          },
+          %Variation{
+            id: :danger,
+            attributes: %{link: true, kind: "danger"},
+            slots: ["danger link"]
+          }
+        ]
       }
     ]
   end
