@@ -32,17 +32,17 @@ defmodule Storybook.CoreComponents.Button do
         variations: [
           %Variation{
             id: :primary,
-            attributes: %{class: "rounded-full", kind: "primary"},
+            attributes: %{class: "w-full", kind: "primary"},
             slots: ["primary classes"]
           },
           %Variation{
             id: :secondary,
-            attributes: %{class: "rounded-full", kind: "secondary"},
+            attributes: %{class: "w-full", kind: "secondary"},
             slots: ["secondary classes"]
           },
           %Variation{
             id: :danger,
-            attributes: %{class: "rounded-full", kind: "danger"},
+            attributes: %{class: "w-full", kind: "danger"},
             slots: ["danger classes"]
           }
         ]
@@ -86,6 +86,108 @@ defmodule Storybook.CoreComponents.Button do
             id: :danger,
             attributes: %{link: true, kind: "danger"},
             slots: ["danger link"]
+          }
+        ]
+      },
+      %VariationGroup{
+        id: :lead_icon,
+        description: "Buttons with leading icon",
+        variations: [
+          %Variation{
+            id: :primary,
+            attributes: %{link: true, kind: "primary"},
+            slots: [
+              "primary link",
+              """
+              <:lead_icon>
+                <Heroicons.plus_circle
+                  mini
+                  class="w-5 h-5"
+                />
+              </:lead_icon>
+              """
+            ]
+          },
+          %Variation{
+            id: :secondary,
+            attributes: %{link: true, kind: "secondary"},
+            slots: [
+              "secondary link",
+              """
+              <:lead_icon>
+                <Heroicons.printer
+                  mini
+                  class="w-5 h-5"
+                />
+              </:lead_icon>
+              """
+            ]
+          },
+          %Variation{
+            id: :danger,
+            attributes: %{link: true, kind: "danger"},
+            slots: [
+              "danger link",
+              """
+              <:lead_icon>
+                <Heroicons.x_circle
+                  mini
+                  class="w-5 h-5"
+                />
+              </:lead_icon>
+              """
+            ]
+          }
+        ]
+      },
+      %VariationGroup{
+        id: :trail_icon,
+        description: "Buttons with trailing icon",
+        variations: [
+          %Variation{
+            id: :primary,
+            attributes: %{link: true, kind: "primary"},
+            slots: [
+              "primary link",
+              """
+              <:trail_icon>
+                <Heroicons.plus_circle
+                  mini
+                  class="w-5 h-5"
+                />
+              </:trail_icon>
+              """
+            ]
+          },
+          %Variation{
+            id: :secondary,
+            attributes: %{link: true, kind: "secondary"},
+            slots: [
+              "secondary link",
+              """
+              <:trail_icon>
+                <Heroicons.printer
+                  mini
+                  class="w-5 h-5"
+                />
+              </:trail_icon>
+              """
+            ]
+          },
+          %Variation{
+            id: :danger,
+            attributes: %{link: true, kind: "danger"},
+            slots: [
+              "danger link",
+              """
+              <:trail_icon>
+                <Heroicons.x_circle
+                  mini
+                  class="w-5 h-5"
+                />
+              </:trail_icon>
+              """
+            ]
           }
         ]
       }

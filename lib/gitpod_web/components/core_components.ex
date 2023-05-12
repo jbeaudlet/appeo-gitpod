@@ -34,22 +34,23 @@ defmodule GitpodWeb.CoreComponents do
         <:cancel>Cancel</:cancel>
       </.modal>
   """
-  attr :id, :string, required: true
-  attr :show, :boolean, default: false
-  attr :on_cancel, JS, default: %JS{}
-  attr :on_confirm, JS, default: %JS{}
+  attr(:id, :string, required: true)
+  attr(:show, :boolean, default: false)
+  attr(:on_cancel, JS, default: %JS{})
+  attr(:on_confirm, JS, default: %JS{})
 
-  attr :kind, :atom,
+  attr(:kind, :atom,
     values: [:none, :info, :success, :warning, :error],
     default: :none,
     doc: "used for styling the color backrgound icon slot"
+  )
 
-  slot :inner_block, required: true
-  slot :icon
-  slot :title
-  slot :subtitle
-  slot :confirm
-  slot :cancel
+  slot(:inner_block, required: true)
+  slot(:icon)
+  slot(:title)
+  slot(:subtitle)
+  slot(:confirm)
+  slot(:cancel)
 
   def modal(assigns) do
     ~H"""
@@ -159,19 +160,20 @@ defmodule GitpodWeb.CoreComponents do
       <.flash kind={:info} flash={@flash} />
       <.flash kind={:info} phx-mounted={show("#flash")}>Welcome Back!</.flash>
   """
-  attr :id, :string, default: "flash", doc: "the optional id of flash container"
-  attr :flash, :map, default: %{}, doc: "the map of flash messages to display"
-  attr :title, :string, default: nil
+  attr(:id, :string, default: "flash", doc: "the optional id of flash container")
+  attr(:flash, :map, default: %{}, doc: "the map of flash messages to display")
+  attr(:title, :string, default: nil)
 
-  attr :kind, :atom,
+  attr(:kind, :atom,
     values: [:info, :success, :warning, :error],
     doc: "used for styling and flash lookup"
+  )
 
-  attr :autoshow, :boolean, default: true, doc: "whether to auto show the flash on mount"
-  attr :close, :boolean, default: true, doc: "whether the flash can be closed"
-  attr :rest, :global, doc: "the arbitrary HTML attributes to add to the flash container"
+  attr(:autoshow, :boolean, default: true, doc: "whether to auto show the flash on mount")
+  attr(:close, :boolean, default: true, doc: "whether the flash can be closed")
+  attr(:rest, :global, doc: "the arbitrary HTML attributes to add to the flash container")
 
-  slot :inner_block, doc: "the optional inner block that renders the flash message"
+  slot(:inner_block, doc: "the optional inner block that renders the flash message")
 
   def flash(assigns) do
     ~H"""
@@ -243,7 +245,7 @@ defmodule GitpodWeb.CoreComponents do
 
       <.flash_group flash={@flash} />
   """
-  attr :flash, :map, required: true, doc: "the map of flash messages"
+  attr(:flash, :map, required: true, doc: "the map of flash messages")
 
   def flash_group(assigns) do
     ~H"""
@@ -278,16 +280,17 @@ defmodule GitpodWeb.CoreComponents do
         </ul>
       </.alert>
   """
-  attr :id, :string, default: "alert", doc: "the optional id of alert container"
-  attr :title, :string, default: nil
+  attr(:id, :string, default: "alert", doc: "the optional id of alert container")
+  attr(:title, :string, default: nil)
 
-  attr :kind, :atom,
+  attr(:kind, :atom,
     values: [:info, :success, :warning, :error],
     doc: "used for styling of alert"
+  )
 
-  attr :rest, :global, doc: "the arbitrary HTML attributes to add to the alert container"
+  attr(:rest, :global, doc: "the arbitrary HTML attributes to add to the alert container")
 
-  slot :inner_block, doc: "the optional inner block that renders the alert message"
+  slot(:inner_block, doc: "the optional inner block that renders the alert message")
 
   def alert(assigns) do
     ~H"""
@@ -373,15 +376,16 @@ defmodule GitpodWeb.CoreComponents do
         </:actions>
       </.simple_form>
   """
-  attr :for, :any, required: true, doc: "the datastructure for the form"
-  attr :as, :any, default: nil, doc: "the server side parameter to collect all input under"
+  attr(:for, :any, required: true, doc: "the datastructure for the form")
+  attr(:as, :any, default: nil, doc: "the server side parameter to collect all input under")
 
-  attr :rest, :global,
+  attr(:rest, :global,
     include: ~w(autocomplete name rel action enctype method novalidate target),
     doc: "the arbitrary HTML attributes to apply to the form tag"
+  )
 
-  slot :inner_block, required: true
-  slot :actions, doc: "the slot for form actions, such as a submit button"
+  slot(:inner_block, required: true)
+  slot(:actions, doc: "the slot for form actions, such as a submit button")
 
   def simple_form(assigns) do
     ~H"""
@@ -404,19 +408,22 @@ defmodule GitpodWeb.CoreComponents do
       <.button>Send!</.button>
       <.button phx-click="go" class="ml-2">Send!</.button>
   """
-  attr :link, :boolean, default: false, doc: "if true, display a link styled like a button"
+  attr(:link, :boolean, default: false, doc: "if true, display a link styled like a button")
 
-  attr :type, :string, default: nil
-  attr :class, :string, default: nil
+  attr(:type, :string, default: nil)
+  attr(:class, :string, default: nil)
 
-  attr :kind, :string,
+  attr(:kind, :string,
     values: ~w(primary secondary danger),
     default: "primary",
     doc: "used for styling"
+  )
 
-  attr :rest, :global, include: ~w(disabled form name value)
+  attr(:rest, :global, include: ~w(disabled form name value))
 
-  slot :inner_block, required: true
+  slot(:lead_icon)
+  slot(:inner_block, required: true)
+  slot(:trail_icon)
 
   def button(assigns) do
     ~H"""
@@ -425,21 +432,37 @@ defmodule GitpodWeb.CoreComponents do
       type={@type}
       class={[
         get_button_classes(@kind, "button"),
+        (@lead_icon != [] || @trail_icon != []) &&
+          "inline-flex items-center gap-x-1.5",
         @class
       ]}
       {@rest}
     >
+      <span :if={@lead_icon != []} class="-ml-0.5">
+        <%= render_slot(@lead_icon) %>
+      </span>
       <%= render_slot(@inner_block) %>
+      <span :if={@trail_icon != []} class="-mr-0.5">
+        <%= render_slot(@trail_icon) %>
+      </span>
     </button>
     <.link
       :if={@link}
       class={[
         get_button_classes(@kind, "link"),
+        (@lead_icon != [] || @trail_icon != []) &&
+          "inline-flex items-center gap-x-1.5",
         @class
       ]}
       {@rest}
     >
+      <span :if={@lead_icon != []} class="-ml-0.5">
+        <%= render_slot(@lead_icon) %>
+      </span>
       <%= render_slot(@inner_block) %>
+      <span :if={@trail_icon != []} class="-mr-0.5">
+        <%= render_slot(@trail_icon) %>
+      </span>
     </.link>
     """
   end
@@ -456,28 +479,30 @@ defmodule GitpodWeb.CoreComponents do
       <.input field={@form[:email]} type="email" />
       <.input name="my-input" errors={["oh no!"]} />
   """
-  attr :id, :any, default: nil
-  attr :name, :any
-  attr :label, :string, default: nil
-  attr :help_text, :string, default: nil
-  attr :value, :any
+  attr(:id, :any, default: nil)
+  attr(:name, :any)
+  attr(:label, :string, default: nil)
+  attr(:help_text, :string, default: nil)
+  attr(:value, :any)
 
-  attr :type, :string,
+  attr(:type, :string,
     default: "text",
     values: ~w(checkbox color date datetime-local email file hidden month number password
                range radio search select tel text textarea time url week)
+  )
 
-  attr :field, Phoenix.HTML.FormField,
+  attr(:field, Phoenix.HTML.FormField,
     doc: "a form field struct retrieved from the form, for example: @form[:email]"
+  )
 
-  attr :errors, :list, default: []
-  attr :checked, :boolean, doc: "the checked flag for checkbox inputs"
-  attr :prompt, :string, default: nil, doc: "the prompt for select inputs"
-  attr :options, :list, doc: "the options to pass to Phoenix.HTML.Form.options_for_select/2"
-  attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
-  attr :rest, :global, include: ~w(autocomplete cols disabled form max maxlength min minlength
-                                   pattern placeholder readonly required rows size step)
-  slot :inner_block
+  attr(:errors, :list, default: [])
+  attr(:checked, :boolean, doc: "the checked flag for checkbox inputs")
+  attr(:prompt, :string, default: nil, doc: "the prompt for select inputs")
+  attr(:options, :list, doc: "the options to pass to Phoenix.HTML.Form.options_for_select/2")
+  attr(:multiple, :boolean, default: false, doc: "the multiple flag for select inputs")
+  attr(:rest, :global, include: ~w(autocomplete cols disabled form max maxlength min minlength
+                                   pattern placeholder readonly required rows size step))
+  slot(:inner_block)
 
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
     assigns
@@ -657,8 +682,8 @@ defmodule GitpodWeb.CoreComponents do
   @doc """
   Renders a label.
   """
-  attr :for, :string, default: nil
-  slot :inner_block, required: true
+  attr(:for, :string, default: nil)
+  slot(:inner_block, required: true)
 
   def label(assigns) do
     ~H"""
@@ -671,9 +696,9 @@ defmodule GitpodWeb.CoreComponents do
   @doc """
   Generates a generic error message.
   """
-  attr :id, :string
+  attr(:id, :string)
 
-  slot :inner_block, required: true
+  slot(:inner_block, required: true)
 
   def error(assigns) do
     ~H"""
@@ -686,11 +711,11 @@ defmodule GitpodWeb.CoreComponents do
   @doc """
   Renders a header with title.
   """
-  attr :class, :string, default: nil
+  attr(:class, :string, default: nil)
 
-  slot :inner_block, required: true
-  slot :subtitle
-  slot :actions
+  slot(:inner_block, required: true)
+  slot(:subtitle)
+  slot(:actions)
 
   def header(assigns) do
     ~H"""
@@ -718,20 +743,21 @@ defmodule GitpodWeb.CoreComponents do
         <:col :let={user} label="username"><%= user.username %></:col>
       </.table>
   """
-  attr :id, :string, required: true
-  attr :rows, :list, required: true
-  attr :row_id, :any, default: nil, doc: "the function for generating the row id"
-  attr :row_click, :any, default: nil, doc: "the function for handling phx-click on each row"
+  attr(:id, :string, required: true)
+  attr(:rows, :list, required: true)
+  attr(:row_id, :any, default: nil, doc: "the function for generating the row id")
+  attr(:row_click, :any, default: nil, doc: "the function for handling phx-click on each row")
 
-  attr :row_item, :any,
+  attr(:row_item, :any,
     default: &Function.identity/1,
     doc: "the function for mapping each row before calling the :col and :action slots"
+  )
 
   slot :col, required: true do
-    attr :label, :string
+    attr(:label, :string)
   end
 
-  slot :action, doc: "the slot for showing user actions in the last table column"
+  slot(:action, doc: "the slot for showing user actions in the last table column")
 
   def table(assigns) do
     assigns =
@@ -795,7 +821,7 @@ defmodule GitpodWeb.CoreComponents do
       </.list>
   """
   slot :item, required: true do
-    attr :title, :string, required: true
+    attr(:title, :string, required: true)
   end
 
   def list(assigns) do
@@ -818,8 +844,8 @@ defmodule GitpodWeb.CoreComponents do
 
       <.back navigate={~p"/posts"}>Back to posts</.back>
   """
-  attr :navigate, :any, required: true
-  slot :inner_block, required: true
+  attr(:navigate, :any, required: true)
+  slot(:inner_block, required: true)
 
   def back(assigns) do
     ~H"""
