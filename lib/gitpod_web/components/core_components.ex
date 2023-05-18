@@ -445,7 +445,7 @@ defmodule GitpodWeb.CoreComponents do
         :if={@lead_icon == []}
         class="-ml-0.5 hidden motion-safe:phx-submit-loading:inline"
         role="status"
-        aria-label="loading"
+        aria-label={gettext("loading")}
       >
         <svg
           aria-hidden="true"
