@@ -3,6 +3,14 @@ defmodule Storybook.CoreComponents.Button do
 
   def function, do: &Elixir.GitpodWeb.CoreComponents.button/1
 
+  def template do
+    """
+    <div class="lsb-flex lsb-space-x-4">
+      <.lsb-variation-group/>
+    </div>
+    """
+  end
+
   def variations do
     [
       %VariationGroup{
@@ -29,6 +37,7 @@ defmodule Storybook.CoreComponents.Button do
       %VariationGroup{
         id: :classes,
         description: "Buttons with classes",
+        template: "<.lsb-variation-group/>",
         variations: [
           %Variation{
             id: :primary,
@@ -188,6 +197,32 @@ defmodule Storybook.CoreComponents.Button do
               </:trail_icon>
               """
             ]
+          }
+        ]
+      },
+      %VariationGroup{
+        id: :loading,
+        description: "Different loading color buttons",
+        template: """
+            <div class="lsb-flex lsb-space-x-4 phx-submit-loading">
+            <.lsb-variation-group/>
+          </div>
+        """,
+        variations: [
+          %Variation{
+            id: :primary,
+            attributes: %{kind: "primary"},
+            slots: ["primary button"]
+          },
+          %Variation{
+            id: :secondary,
+            attributes: %{kind: "secondary"},
+            slots: ["secondary button"]
+          },
+          %Variation{
+            id: :danger,
+            attributes: %{kind: "danger"},
+            slots: ["danger button"]
           }
         ]
       }
