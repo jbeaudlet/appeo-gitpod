@@ -188,6 +188,16 @@ defmodule GitpodWeb.CoreComponents do
     >
       <div class="flex flex-col items-center w-full space-y-4 sm:items-end">
         <div class="w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-lg pointer-events-auto ring-1 ring-black ring-opacity-5">
+          <div class="w-full h-0.5 bg-gray-200 rounded-full dark:bg-gray-700">
+            <div class={[
+              "h-0.5 rounded-full transition-all ease-out duration-5000",
+              @kind == :info && "bg-blue-600 dark:bg-blue-500",
+              @kind == :success && "bg-green-600 dark:bg-green-500",
+              @kind == :warning && "bg-yellow-600 dark:bg-yellow-500",
+              @kind == :error && "bg-red-600 dark:bg-red-500"
+            ]}>
+            </div>
+          </div>
           <div class="p-4">
             <div class="flex items-start">
               <div class="flex-shrink-0">

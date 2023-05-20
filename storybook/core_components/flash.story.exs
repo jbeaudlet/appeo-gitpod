@@ -8,7 +8,7 @@ defmodule Storybook.CoreComponents.Flash do
   def template do
     """
     <.button phx-click={show("#:variation_id")} lsb-code-hidden>
-      Open flash
+      Open #{":variation_id"}
     </.button>
     <.lsb-variation/>
     """
@@ -16,13 +16,31 @@ defmodule Storybook.CoreComponents.Flash do
 
   def variations do
     [
-      %Variation{
-        id: :info_no_title,
-        attributes: %{
-          kind: :info,
-          autoshow: false
-        },
-        slots: ["Info message"]
+      %VariationGroup{
+        id: :no_title,
+        description: "Different flash message types without title",
+        variations: [
+          %Variation{
+            id: :info,
+            attributes: %{kind: :info, autoshow: false},
+            slots: ["Info message"]
+          },
+          %Variation{
+            id: :success,
+            attributes: %{kind: :success, autoshow: false},
+            slots: ["Success message"]
+          },
+          %Variation{
+            id: :warning,
+            attributes: %{kind: :warning, autoshow: false},
+            slots: ["Warning message"]
+          },
+          %Variation{
+            id: :error,
+            attributes: %{kind: :error, autoshow: false},
+            slots: ["Error message"]
+          }
+        ]
       },
       %Variation{
         id: :error_with_title,
