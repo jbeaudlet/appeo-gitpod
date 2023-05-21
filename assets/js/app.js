@@ -22,6 +22,7 @@ import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
 import { getHooks } from "live_svelte";
+import Hooks from "./hooks";
 import * as SvelteComponents from "../svelte/**/*";
 
 // Shoelace Web Components
@@ -44,7 +45,7 @@ setBasePath("../vendor/shoelace/assets");
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {
-	hooks: getHooks(SvelteComponents),
+	hooks: Hooks,
 	params: { _csrf_token: csrfToken },
 });
 

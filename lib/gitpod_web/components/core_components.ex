@@ -182,6 +182,7 @@ defmodule GitpodWeb.CoreComponents do
       id={@id}
       phx-mounted={@autoshow && show("##{@id}")}
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
+      phx-hook="FlashTimer"
       aria-live="assertive"
       class="fixed inset-0 z-50 flex items-end hidden px-4 py-6 pointer-events-none sm:items-start sm:p-6"
       {@rest}
@@ -941,6 +942,14 @@ defmodule GitpodWeb.CoreComponents do
          "translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2",
          "translate-y-0 opacity-100 sm:translate-x-0"}
     )
+
+    # JS.push("lv:clear-flash", value: %{key: kind}) |> hide(selector)
+
+    # Process.send_after(
+    #   self(),
+    #   JS.exec("phx-click", to: selector),
+    #   5000
+    # )
   end
 
   def hide(js \\ %JS{}, selector) do
