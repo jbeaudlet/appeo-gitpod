@@ -260,10 +260,10 @@ defmodule GitpodWeb.CoreComponents do
 
   def flash_group(assigns) do
     ~H"""
-    <.flash kind={:info} title="Information!" flash={@flash} />
-    <.flash kind={:success} title="Success!" flash={@flash} />
-    <.flash kind={:warning} title="Warning!" flash={@flash} />
-    <.flash kind={:error} title="Error!" flash={@flash} />
+    <.flash kind={:info} title={gettext("Information")} flash={@flash} />
+    <.flash kind={:success} title={gettext("Success")} flash={@flash} />
+    <.flash kind={:warning} title={gettext("Warning")} flash={@flash} />
+    <.flash kind={:error} title={gettext("Error")} flash={@flash} />
     <.flash
       id="disconnected"
       kind={:error}
