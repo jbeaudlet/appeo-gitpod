@@ -18,6 +18,14 @@ module.exports = {
 			},
 			animation: {
 				"spin-quick": "spin 0.5s linear infinite",
+				"progress-timer": "progress-timer 5s linear 1 forwards",
+			},
+			keyframes: {
+				"progress-timer": {
+					"0%": { width: "0%" },
+					"80%": { opacity: "1" },
+					"100%": { opacity: 0.5, width: "100%" },
+				},
 			},
 		},
 	},

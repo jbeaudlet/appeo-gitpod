@@ -184,63 +184,47 @@ defmodule GitpodWeb.CoreComponents do
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       phx-hook="FlashTimer"
       aria-live="assertive"
-      class="fixed inset-0 z-50 flex items-end hidden px-4 py-6 pointer-events-none sm:items-start sm:p-6"
+      class="relative w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-lg pointer-events-auto ring-1 ring-black ring-opacity-5"
       {@rest}
     >
-      <div class="flex flex-col items-center w-full space-y-4 sm:items-end">
-        <div class="w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-lg pointer-events-auto ring-1 ring-black ring-opacity-5">
-          <div class="w-full h-0.5 bg-gray-200 rounded-full dark:bg-gray-700">
+      <div class="p-4">
+        <div class="flex items-start">
+          <div class="flex-shrink-0">
+            <Heroicons.information_circle :if={@kind == :info} outline class="w-6 h-6 text-blue-400" />
+            <Heroicons.check_circle :if={@kind == :success} outline class="w-6 h-6 text-green-400" />
+            <Heroicons.exclamation_triangle
+              :if={@kind == :warning}
+              outline
+              class="w-6 h-6 text-yellow-400"
+            />
+            <Heroicons.exclamation_circle :if={@kind == :error} outline class="w-6 h-6 text-red-400" />
+          </div>
+          <div class="ml-3 w-0 flex-1 pt-0.5">
+            <p :if={@title} class="text-sm font-medium text-gray-900">
+              <%= @title %>
+            </p>
+            <div class={["text-sm text-gray-500", @title && "mt-1"]}>
+              <%= msg %>
+            </div>
+          </div>
+          <div :if={@close} class="flex flex-shrink-0 ml-4">
+            <button
+              type="button"
+              class="inline-flex text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+              aria-label={gettext("close")}
+            >
+              <span class="sr-only"><%= gettext("close") %></span>
+              <Heroicons.x_mark solid class="w-5 h-5" />
+            </button>
+          </div>
+          <div class="absolute bottom-0 left-0 right-0 w-full">
             <div class={[
-              "h-0.5 rounded-full transition-all ease-out duration-5000",
+              "h-0.5 rounded-full w-0 animate-progress-timer",
               @kind == :info && "bg-blue-600 dark:bg-blue-500",
               @kind == :success && "bg-green-600 dark:bg-green-500",
               @kind == :warning && "bg-yellow-600 dark:bg-yellow-500",
               @kind == :error && "bg-red-600 dark:bg-red-500"
             ]}>
-            </div>
-          </div>
-          <div class="p-4">
-            <div class="flex items-start">
-              <div class="flex-shrink-0">
-                <Heroicons.information_circle
-                  :if={@kind == :info}
-                  outline
-                  class="w-6 h-6 text-blue-400"
-                />
-                <Heroicons.check_circle
-                  :if={@kind == :success}
-                  outline
-                  class="w-6 h-6 text-green-400"
-                />
-                <Heroicons.exclamation_triangle
-                  :if={@kind == :warning}
-                  outline
-                  class="w-6 h-6 text-yellow-400"
-                />
-                <Heroicons.exclamation_circle
-                  :if={@kind == :error}
-                  outline
-                  class="w-6 h-6 text-red-400"
-                />
-              </div>
-              <div class="ml-3 w-0 flex-1 pt-0.5">
-                <p :if={@title} class="text-sm font-medium text-gray-900">
-                  <%= @title %>
-                </p>
-                <div class={["text-sm text-gray-500", @title && "mt-1"]}>
-                  <%= msg %>
-                </div>
-              </div>
-              <div :if={@close} class="flex flex-shrink-0 ml-4">
-                <button
-                  type="button"
-                  class="inline-flex text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                  aria-label={gettext("close")}
-                >
-                  <span class="sr-only"><%= gettext("close") %></span>
-                  <Heroicons.x_mark solid class="w-5 h-5" />
-                </button>
-              </div>
             </div>
           </div>
         </div>
